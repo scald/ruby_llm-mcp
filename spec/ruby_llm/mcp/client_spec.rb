@@ -172,7 +172,7 @@ RSpec.describe RubyLLM::MCP::Client do
     end
 
     it "wraps the returned tools" do
-      tools
+      expect(tools).to eq mcp_tools
 
       expect(RubyLLM::MCP::Tool).to have_received(:new).with(client, "tool1")
       expect(RubyLLM::MCP::Tool).to have_received(:new).with(client, "tool2")
