@@ -1,3 +1,9 @@
+# frozen_string_literal: true
+
+plugins:
+  - rubocop-rake
+  - rubocop-rspec
+
 AllCops:
   NewCops: enable
   TargetRubyVersion: 3.1
@@ -29,7 +35,19 @@ Layout/LineLength:
   Max: 120
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 35
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/ClassLength:
+  Enabled: false
+
+Metrics/CyclomaticComplexity:
+  Enabled: false
+
+Metrics/PerceivedComplexity:
+  Enabled: false
 
 Metrics/BlockLength:
   Exclude:

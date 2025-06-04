@@ -40,6 +40,7 @@ module RubyLLM
           start_sse_listener
         end
 
+        # rubocop:disable Metrics/MethodLength
         def request(body, wait_for_response: true)
           # Generate a unique request ID
           @id_mutex.synchronize { @id_counter += 1 }
@@ -88,6 +89,7 @@ module RubyLLM
             raise RubyLLM::MCP::Errors::TimeoutError.new(message: "Request timed out after 30 seconds")
           end
         end
+        # rubocop:enable Metrics/MethodLength
 
         def close
           @running = false

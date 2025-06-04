@@ -2,6 +2,6 @@
 
 RSpec.describe RubyLLM::MCP do
   it "has a version number" do
-    expect(RubyLLM::MCP::VERSION).not_to be nil
+    expect(RubyLLM::MCP::VERSION).not_to be_nil
   end
 end
