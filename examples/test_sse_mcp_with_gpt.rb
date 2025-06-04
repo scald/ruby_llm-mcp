@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 # frozen_string_literal: true
 
 require "bundler/setup"
@@ -21,7 +20,7 @@ client = RubyLLM::MCP.client(
 )
 
 tools = client.tools
-puts tools.map { |tool| "#{tool.name}: #{tool.description}" }.join("\n")
+puts tools.map { |tool| "  #{tool.name}: #{tool.description}" }.join("\n")
 puts "-" * 50
 
 chat = RubyLLM.chat(model: "gpt-4.1")

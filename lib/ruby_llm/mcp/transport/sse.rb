@@ -14,7 +14,12 @@ module RubyLLM
 
         def initialize(url, headers: {})
           @event_url = url
-          @messages_url = url.gsub("sse", "messages")
+          @messages_url = nil
+
+          uri = URI.parse(url)
+          @root_url = "#{uri.scheme}://#{uri.host}"
+          @root_url += ":#{uri.port}" if uri.port != uri.default_port
+
           @client_id = SecureRandom.uuid
           @headers = headers.merge({
                                      "Accept" => "text/event-stream",
@@ -35,6 +40,7 @@ module RubyLLM
           start_sse_listener
         end
 
+        # rubocop:disable Metrics/MethodLength
         def request(body, wait_for_response: true)
           # Generate a unique request ID
           @id_mutex.synchronize { @id_counter += 1 }
@@ -83,6 +89,7 @@ module RubyLLM
             raise RubyLLM::MCP::Errors::TimeoutError.new(message: "Request timed out after 30 seconds")
           end
         end
+        # rubocop:enable Metrics/MethodLength
 
         def close
           @running = false
@@ -96,17 +103,35 @@ module RubyLLM
           @connection_mutex.synchronize do
             return if sse_thread_running?
 
+            response_queue = Queue.new
+            @pending_mutex.synchronize do
+              @pending_requests["endpoint"] = response_queue
+            end
+
             @sse_thread = Thread.new do
               listen_for_events while @running
             end
-
             @sse_thread.abort_on_exception = true
-            sleep 0.1 # Wait for the SSE connection to be established
+
+            endpoint = response_queue.pop
+            set_message_endpoint(endpoint)
+
+            @pending_mutex.synchronize { @pending_requests.delete("endpoint") }
           end
         end
 
+        def set_message_endpoint(endpoint)
+          uri = URI.parse(endpoint)
+
+          @messages_url = if uri.host.nil?
+                            "#{@root_url}#{endpoint}"
+                          else
+                            endpoint
+                          end
+        end
+
         def sse_thread_running?
-          @sse_thread && @sse_thread.alive?
+          @sse_thread&.alive?
         end
 
         def listen_for_events
@@ -160,14 +185,19 @@ module RubyLLM
         def process_event(raw_event)
           return if raw_event[:data].nil?
 
-          event = begin
-            JSON.parse(raw_event[:data])
-          rescue StandardError
-            nil
-          end
-          return if event.nil?
+          if raw_event[:event] == "endpoint"
+            request_id = "endpoint"
+            event = raw_event[:data]
+          else
+            event = begin
+              JSON.parse(raw_event[:data])
+            rescue StandardError
+              nil
+            end
+            return if event.nil?
 
-          request_id = event["id"]&.to_s
+            request_id = event["id"]&.to_s
+          end
 
           @pending_mutex.synchronize do
             if request_id && @pending_requests.key?(request_id)
