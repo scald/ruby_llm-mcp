@@ -22,7 +22,8 @@ Style/FrozenStringLiteralComment:
 Style/IfUnlessModifier:
   Enabled: false
 
-
+Naming/AccessorMethodName:
+  Enabled: false
 
 Layout/LineLength:
   Max: 120

@@ -111,10 +111,21 @@ module RubyLLM
             end
             @sse_thread.abort_on_exception = true
 
-            post_endpoint = response_queue.pop
-            @messages_url = "#{@root_url}#{post_endpoint}"
+            endpoint = response_queue.pop
+            set_message_endpoint(endpoint)
+
             @pending_mutex.synchronize { @pending_requests.delete("endpoint") }
           end
+        end
+
+        def set_message_endpoint(endpoint)
+          uri = URI.parse(endpoint)
+
+          @messages_url = if uri.host.nil?
+                            "#{@root_url}#{endpoint}"
+                          else
+                            endpoint
+                          end
         end
 
         def sse_thread_running?
