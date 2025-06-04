@@ -52,3 +52,12 @@ Metrics/PerceivedComplexity:
 Metrics/BlockLength:
   Exclude:
     - 'spec/**/*'
+
+RSpec/DescribedClass:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Max: 5
+
+RSpec/MultipleMemoizedHelpers:
+  Max: 15
