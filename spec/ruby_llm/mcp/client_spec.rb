@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 RSpec.describe RubyLLM::MCP::Client do
   let(:name) { "name" }
   let(:transport_type) { "stdio" }
@@ -50,7 +52,7 @@ RSpec.describe RubyLLM::MCP::Client do
       expect(client.config).to be_empty
     end
 
-    context "given a transport type of stdio" do
+    context "with a transport type of stdio" do
       subject(:client) do
         described_class.new(name: name, transport_type: transport_type, config: config)
       end
@@ -76,7 +78,7 @@ RSpec.describe RubyLLM::MCP::Client do
       end
     end
 
-    context "given a transport type of sse" do
+    context "with a transport type of sse" do
       subject(:client) do
         described_class.new(name: name, transport_type: transport_type, config: config)
       end
@@ -97,8 +99,9 @@ RSpec.describe RubyLLM::MCP::Client do
       end
     end
 
-    context "given an unknown transport type" do
+    context "with an unknown transport type" do
       let(:transport_type) { "unknown" }
+
       it "raises an error" do
         expect { client }.to raise_error(/Invalid transport type/)
       end
@@ -126,7 +129,7 @@ RSpec.describe RubyLLM::MCP::Client do
       expect(stdio_transport).to have_received(:request).with(anything, wait_for_response: true)
     end
 
-    context "given wait_for_response: false" do
+    context "with wait_for_response: false" do
       subject(:request) do
         described_class.new(name: name, transport_type: transport_type).request("body", wait_for_response: false)
       end
@@ -185,7 +188,7 @@ RSpec.describe RubyLLM::MCP::Client do
       expect(tool_list).to have_received(:call).once
     end
 
-    context "given refresh: true" do
+    context "with refresh: true" do
       it "ignores the cache" do
         client.tools(refresh: true)
         client.tools(refresh: true)
