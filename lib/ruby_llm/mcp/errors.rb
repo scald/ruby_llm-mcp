@@ -3,7 +3,7 @@
 module RubyLLM
   module MCP
     module Errors
-      class TimeoutError < StandardError
+      class BaseError < StandardError
         attr_reader :message
 
         def initialize(message:)
@@ -11,6 +11,12 @@ module RubyLLM
           super(message)
         end
       end
+
+      class InvalidProtocolVersionError < BaseError; end
+
+      class SessionExpiredError < BaseError; end
+
+      class TimeoutError < BaseError; end
     end
   end
 end

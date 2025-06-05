@@ -13,20 +13,23 @@ AllCops:
     - 'db/**/*'
     - 'tmp/**/*'
 
-Style/Documentation:
+Style/ClassAndModuleChildren:
   Enabled: false
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
-Style/ClassAndModuleChildren:
+Style/Documentation:
   Enabled: false
 
 Style/FrozenStringLiteralComment:
   Enabled: true
 
+Style/GuardClause:
+  Enabled: false
+
 Style/IfUnlessModifier:
   Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
 
 Naming/AccessorMethodName:
   Enabled: false

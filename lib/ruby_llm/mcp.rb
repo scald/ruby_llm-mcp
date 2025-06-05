@@ -17,8 +17,8 @@ module RubyLLM
     end
 
     def support_complex_parameters!
-      require_relative "providers/open_ai/complex_parameter_support"
-      require_relative "providers/anthropic/complex_parameter_support"
+      require_relative "mcp/providers/open_ai/complex_parameter_support"
+      require_relative "mcp/providers/anthropic/complex_parameter_support"
     end
   end
 end

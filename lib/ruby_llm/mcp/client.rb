@@ -4,19 +4,25 @@ module RubyLLM
   module MCP
     class Client
       PROTOCOL_VERSION = "2025-03-26"
-      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url
+      PV_2024_11_05 = "2024-11-05"
+
+      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version
 
       def initialize(name:, transport_type:, request_timeout: 8000, reverse_proxy_url: nil, config: {})
         @name = name
         @config = config
+        @protocol_version = PROTOCOL_VERSION
+        @headers = config[:headers] || {}
+
         @transport_type = transport_type.to_sym
 
-        # TODO: Add streamable HTTP
         case @transport_type
         when :sse
-          @transport = RubyLLM::MCP::Transport::SSE.new(@config[:url])
+          @transport = RubyLLM::MCP::Transport::SSE.new(@config[:url], headers: @headers)
         when :stdio
           @transport = RubyLLM::MCP::Transport::Stdio.new(@config[:command], args: @config[:args], env: @config[:env])
+        when :streamable
+          @transport = RubyLLM::MCP::Transport::Streamable.new(@config[:url], headers: @headers)
         else
           raise "Invalid transport type: #{transport_type}"
         end

@@ -12,14 +12,10 @@ class RubyLLM::MCP::Requests::Initialization < RubyLLM::MCP::Requests::Base
       jsonrpc: "2.0",
       method: "initialize",
       params: {
-        protocolVersion: RubyLLM::MCP::Client::PROTOCOL_VERSION,
-        capabilities: {
-          tools: {
-            listChanged: true
-          }
-        },
+        protocolVersion: @client.protocol_version,
+        capabilities: {},
         clientInfo: {
-          name: "RubyLLM MCP Client",
+          name: "RubyLLM-MCP Client",
           version: RubyLLM::MCP::VERSION
         }
       }
