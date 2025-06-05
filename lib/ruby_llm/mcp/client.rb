@@ -6,7 +6,8 @@ module RubyLLM
       PROTOCOL_VERSION = "2025-03-26"
       PV_2024_11_05 = "2024-11-05"
 
-      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version
+      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version,
+                  :capabilities
 
       def initialize(name:, transport_type:, request_timeout: 8000, reverse_proxy_url: nil, config: {})
         @name = name
@@ -26,6 +27,7 @@ module RubyLLM
         else
           raise "Invalid transport type: #{transport_type}"
         end
+        @capabilities = nil
 
         @request_timeout = request_timeout
         @reverse_proxy_url = reverse_proxy_url
@@ -56,6 +58,7 @@ module RubyLLM
 
       def initialize_request
         @initialize_response = RubyLLM::MCP::Requests::Initialization.new(self).call
+        @capabilities = RubyLLM::MCP::Capabilities.new(@initialize_response["result"]["capabilities"])
       end
 
       def notification_request
