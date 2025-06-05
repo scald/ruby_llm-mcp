@@ -121,7 +121,7 @@ RSpec.describe RubyLLM::MCP::Client do
 
         expect(RubyLLM::MCP::Transport::Streamable)
           .to have_received(:new)
-          .with("https://url.com", headers: { "Authorization" => "Bearer token" })
+          .with("https://url.com", headers: { "Authorization" => "Bearer token", "User-Agent" => "RubyLLM-MCP/0.0.2" })
       end
     end
 

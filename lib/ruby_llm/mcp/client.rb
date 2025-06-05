@@ -13,7 +13,6 @@ module RubyLLM
         @config = config
         @protocol_version = PROTOCOL_VERSION
         @headers = config[:headers] || {}
-        @headers["User-Agent"] = "RubyLLM-MCP/#{RubyLLM::MCP::VERSION}"
 
         @transport_type = transport_type.to_sym
 
