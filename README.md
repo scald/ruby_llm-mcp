@@ -70,7 +70,7 @@ client = RubyLLM::MCP.client(
 # Or connect via streamable HTTP
 client = RubyLLM::MCP.client(
   name: "my-mcp-server",
-  transport_type: "streamable",
+  transport_type: :streamable",
   config: {
     url: "http://localhost:8080/mcp",
     headers: { "Authorization" => "Bearer your-token" }
@@ -148,7 +148,7 @@ Best for web-based MCP servers or when you need HTTP-based communication:
 ```ruby
 client = RubyLLM::MCP.client(
   name: "web-mcp-server",
-  transport_type: "sse",
+  transport_type: :sse,
   config: {
     url: "https://your-mcp-server.com/mcp/sse"
   }
@@ -162,7 +162,7 @@ Best for HTTP-based MCP servers that support streaming responses:
 ```ruby
 client = RubyLLM::MCP.client(
   name: "streaming-mcp-server",
-  transport_type: "streamable",
+  transport_type: :streamable,
   config: {
     url: "https://your-mcp-server.com/mcp",
     headers: { "Authorization" => "Bearer your-token" }
@@ -177,7 +177,7 @@ Best for local MCP servers or command-line tools:
 ```ruby
 client = RubyLLM::MCP.client(
   name: "local-mcp-server",
-  transport_type: "stdio",
+  transport_type: :stdio,
   config: {
     command: "python",
     args: ["-m", "my_mcp_server"],
