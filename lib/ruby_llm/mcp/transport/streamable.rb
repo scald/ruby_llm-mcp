@@ -147,7 +147,7 @@ module RubyLLM
           when 400..499
             handle_client_error(response)
           when 404
-            handle_session_expired(response)
+            handle_session_expired
           else
             raise "HTTP request failed: #{response.status} - #{response.body}"
           end
@@ -226,7 +226,7 @@ module RubyLLM
           raise "HTTP client error: #{response.status} - #{response.body}"
         end
 
-        def handle_session_expired(response)
+        def handle_session_expired
           @session_id = nil
           raise RubyLLM::MCP::Errors::SessionExpiredError.new(
             message: "Session expired, re-initialization required"
