@@ -45,6 +45,11 @@ module RubyLLM
         @tools ||= fetch_and_create_tools
       end
 
+      def resources(refresh: false)
+        @resources = nil if refresh
+        @resources ||= fetch_and_create_resources
+      end
+
       def execute_tool(name:, parameters:)
         response = execute_tool_request(name: name, parameters: parameters)
         result = response["result"]
@@ -73,12 +78,33 @@ module RubyLLM
         @execute_tool_response = RubyLLM::MCP::Requests::ToolCall.new(self, name: name, parameters: parameters).call
       end
 
+      def resources_list_request
+        @resources_request = RubyLLM::MCP::Requests::ResourcesList.new(self).call
+      end
+
+      def resource_template_list_request
+        @resource_template_list_response = RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
+      end
+
+      def resource_read_request(resource_id:)
+        @resource_read_response = RubyLLM::MCP::Requests::ResourceRead.new(self, resource_id: resource_id).call
+      end
+
       def fetch_and_create_tools
         tools_response = tool_list_request
         tools_response = tools_response["result"]["tools"]
 
         @tools = tools_response.map do |tool|
           RubyLLM::MCP::Tool.new(self, tool)
+        end
+      end
+
+      def fetch_and_create_resources
+        resources_response = resources_list_request
+        resources_response = resources_response["result"]["resources"]
+
+        @resources = resources_response.map do |resource|
+          RubyLLM::MCP::Resource.new(self, resource)
         end
       end
     end
