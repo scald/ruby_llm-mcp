@@ -13,7 +13,7 @@ end
 
 client = RubyLLM::MCP.client(
   name: "local_mcp",
-  transport_type: "sse",
+  transport_type: :sse,
   config: {
     url: "http://localhost:9292/mcp/sse"
   }

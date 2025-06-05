@@ -55,24 +55,6 @@ module RubyLLM
           handle_response(response, request_id, response_queue, wait_for_response)
         end
 
-        def get_sse_stream(last_event_id: nil)
-          headers = build_headers
-          headers["Accept"] = "text/event-stream"
-          headers["Last-Event-ID"] = last_event_id if last_event_id
-
-          response = @connection.get do |req|
-            headers.each { |key, value| req.headers[key] = value }
-          end
-
-          if response.status == 200 && response.headers["content-type"]&.include?("text/event-stream")
-            process_sse_stream(response.body)
-          elsif response.status == 405
-            raise "Server does not support SSE streams via GET"
-          else
-            raise "Failed to establish SSE connection: #{response.status}"
-          end
-        end
-
         def close
           @running = false
           @sse_mutex.synchronize do
@@ -250,9 +232,9 @@ module RubyLLM
 
         def process_sse_stream(sse_body)
           Thread.new do
-            process_sse_events(sse_body) do |event_id, event_data|
+            process_sse_events(sse_body) do |event_data|
               # Handle server-initiated requests/notifications
-              handle_server_message(event_id, event_data) if event_data.is_a?(Hash)
+              handle_server_message(event_data) if event_data.is_a?(Hash)
             end
           rescue StandardError => e
             puts "Error processing SSE stream: #{e.message}"
@@ -271,7 +253,7 @@ module RubyLLM
               unless event_buffer.empty?
                 begin
                   event_data = JSON.parse(event_buffer)
-                  yield [event_id, event_data]
+                  yield event_data
                 rescue JSON::ParserError
                   puts "Warning: Failed to parse SSE event data: #{event_buffer}"
                 end
@@ -289,10 +271,10 @@ module RubyLLM
           end
         end
 
-        def handle_server_message(event_id, message)
+        def handle_server_message(message)
           # Handle server-initiated requests and notifications
           # This would typically be passed to a message handler
-          puts "Received server message: #{event_id} #{message.inspect}"
+          puts "Received server message: #{message.inspect}"
         end
 
         def wait_for_response_with_timeout(request_id, response_queue)
