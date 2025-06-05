@@ -20,6 +20,10 @@ RSpec.describe RubyLLM::MCP::Client do
     instance_double(RubyLLM::MCP::Transport::SSE)
   end
 
+  let(:streamable_transport) do
+    instance_double(RubyLLM::MCP::Transport::Streamable)
+  end
+
   before do
     allow(RubyLLM::MCP::Requests::Initialization).to receive(:new).and_return initialization
     allow(initialization).to receive(:call)
@@ -29,6 +33,7 @@ RSpec.describe RubyLLM::MCP::Client do
 
     allow(RubyLLM::MCP::Transport::Stdio).to receive(:new).and_return stdio_transport
     allow(RubyLLM::MCP::Transport::SSE).to receive(:new).and_return sse_transport
+    allow(RubyLLM::MCP::Transport::Streamable).to receive(:new).and_return streamable_transport
   end
 
   describe "#initialize" do
@@ -96,6 +101,27 @@ RSpec.describe RubyLLM::MCP::Client do
         expect(RubyLLM::MCP::Transport::SSE)
           .to have_received(:new)
           .with("https://url.com")
+      end
+    end
+
+    context "with a transport type of streamable" do
+      subject(:client) do
+        described_class.new(name: name, transport_type: transport_type, config: config)
+      end
+
+      let(:transport_type) { "streamable" }
+      let(:config) { { url: "https://url.com", headers: { "Authorization" => "Bearer token" } } }
+
+      it "creates a Streamable transport" do
+        expect(client.transport).to eq streamable_transport
+      end
+
+      it "initializes the transport with the url and headers" do
+        client
+
+        expect(RubyLLM::MCP::Transport::Streamable)
+          .to have_received(:new)
+          .with("https://url.com", headers: { "Authorization" => "Bearer token" })
       end
     end
 

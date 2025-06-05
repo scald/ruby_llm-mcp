@@ -8,7 +8,7 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 
 ## Features
 
-- 🔌 **Multiple Transport Types**: Support for SSE (Server-Sent Events) and stdio transports
+- 🔌 **Multiple Transport Types**: Support for SSE (Server-Sent Events), Streamable HTTP, and stdio transports
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 🔄 **Real-time Communication**: Efficient bidirectional communication with MCP servers
 - 🎯 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
@@ -64,6 +64,16 @@ client = RubyLLM::MCP.client(
     command: "node",
     args: ["path/to/mcp-server.js"],
     env: { "NODE_ENV" => "production" }
+  }
+)
+
+# Or connect via streamable HTTP
+client = RubyLLM::MCP.client(
+  name: "my-mcp-server",
+  transport_type: "streamable",
+  config: {
+    url: "http://localhost:8080/mcp",
+    headers: { "Authorization" => "Bearer your-token" }
   }
 )
 ```
@@ -145,6 +155,21 @@ client = RubyLLM::MCP.client(
 )
 ```
 
+### Streamable HTTP
+
+Best for HTTP-based MCP servers that support streaming responses:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "streaming-mcp-server",
+  transport_type: "streamable",
+  config: {
+    url: "https://your-mcp-server.com/mcp",
+    headers: { "Authorization" => "Bearer your-token" }
+  }
+)
+```
+
 ### Stdio
 
 Best for local MCP servers or command-line tools:
@@ -164,10 +189,11 @@ client = RubyLLM::MCP.client(
 ## Configuration Options
 
 - `name`: A unique identifier for your MCP client
-- `transport_type`: Either `:sse` or `:stdio`
+- `transport_type`: Either `:sse`, `:streamable`, or `:stdio`
 - `request_timeout`: Timeout for requests in milliseconds (default: 8000)
 - `config`: Transport-specific configuration
   - For SSE: `{ url: "http://..." }`
+  - For Streamable: `{ url: "http://...", headers: {...} }`
   - For stdio: `{ command: "...", args: [...], env: {...} }`
 
 ## Development
