@@ -36,8 +36,8 @@ module RubyLLM
         notification_request
       end
 
-      def request(body, wait_for_response: true)
-        @transport.request(body, wait_for_response: wait_for_response)
+      def request(body, **options)
+        @transport.request(body, **options)
       end
 
       def tools(refresh: false)
@@ -57,6 +57,10 @@ module RubyLLM
         #
         # TODO: Implement "type": "image" and "type": "resource"
         result["content"].map { |content| content["text"] }.join("\n")
+      end
+
+      def resource_read_request(uri:)
+        @resource_read_response = RubyLLM::MCP::Requests::ResourceRead.new(self, uri: uri).call
       end
 
       private
@@ -79,15 +83,11 @@ module RubyLLM
       end
 
       def resources_list_request
-        @resources_request = RubyLLM::MCP::Requests::ResourcesList.new(self).call
+        @resources_request = RubyLLM::MCP::Requests::ResourceList.new(self).call
       end
 
       def resource_template_list_request
         @resource_template_list_response = RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
-      end
-
-      def resource_read_request(resource_id:)
-        @resource_read_response = RubyLLM::MCP::Requests::ResourceRead.new(self, resource_id: resource_id).call
       end
 
       def fetch_and_create_tools

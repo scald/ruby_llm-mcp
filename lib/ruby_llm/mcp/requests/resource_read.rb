@@ -3,9 +3,16 @@
 module RubyLLM
   module MCP
     module Requests
-      class ReadingResource < Base
-        def call(uri:)
-          client.request(reading_resource_body(uri), wait_for_response: false)
+      class ResourceRead
+        attr_reader :client, :uri
+
+        def initialize(client, uri:)
+          @client = client
+          @uri = uri
+        end
+
+        def call
+          client.request(reading_resource_body(uri))
         end
 
         def reading_resource_body(uri)
