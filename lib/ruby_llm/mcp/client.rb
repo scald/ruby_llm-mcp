@@ -36,8 +36,8 @@ module RubyLLM
         notification_request
       end
 
-      def request(body, **options)
-        @transport.request(body, **options)
+      def request(body, add_id: true, wait_for_response: true, **options)
+        @transport.request(body, add_id: add_id, wait_for_response: wait_for_response, **options)
       end
 
       def tools(refresh: false)
