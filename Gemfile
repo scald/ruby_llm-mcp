@@ -13,7 +13,7 @@ group :development do
   gem "rdoc"
   gem "reline"
   gem "rspec", "~> 3.12"
-  gem "rubocop", ">= 1.0"
-  gem "rubocop-rake", ">= 0.6"
-  gem "rubocop-rspec"
+  gem "rubocop", ">= 1.76"
+  gem "rubocop-rake", ">= 0.7"
+  gem "rubocop-rspec", ">= 3.6"
 end

@@ -20,6 +20,10 @@ module RubyLLM
       def tools_list_changed?
         @capabilities.dig("tools", "listChanged") || false
       end
+
+      def completion?
+        @capabilities["completion"].present?
+      end
     end
   end
 end

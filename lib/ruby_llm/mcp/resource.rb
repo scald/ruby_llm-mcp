@@ -27,6 +27,18 @@ module RubyLLM
           response.dig("result", "contents", 0, "blob")
       end
 
+      def arguments_search(argument, value)
+        if template? && @mcp_client.capabilities.completion?
+          response = @mcp_client.completion(type: :resource, name: @name, argument: argument, value: value)
+          response = response.dig("result", "completion")
+
+          Struct.new(:arg_values, :total, :has_more)
+                .new(response["values"], response["total"], response["hasMore"])
+        else
+          []
+        end
+      end
+
       def template?
         @template
       end

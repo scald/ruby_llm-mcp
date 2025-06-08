@@ -36,8 +36,8 @@ module RubyLLM
         notification_request
       end
 
-      def request(body, add_id: true, wait_for_response: true, **options)
-        @transport.request(body, add_id: add_id, wait_for_response: wait_for_response, **options)
+      def request(body, **options)
+        @transport.request(body, **options)
       end
 
       def tools(refresh: false)
@@ -50,6 +50,11 @@ module RubyLLM
         @resources ||= fetch_and_create_resources
       end
 
+      def resource_templates(refresh: false)
+        @resource_templates = nil if refresh
+        @resource_templates ||= fetch_and_create_resources(set_as_template: true)
+      end
+
       def execute_tool(name:, parameters:)
         response = execute_tool_request(name: name, parameters: parameters)
         result = response["result"]
@@ -59,8 +64,12 @@ module RubyLLM
         result["content"].map { |content| content["text"] }.join("\n")
       end
 
-      def resource_read_request(uri:)
-        @resource_read_response = RubyLLM::MCP::Requests::ResourceRead.new(self, uri: uri).call
+      def resource_read_request(**args)
+        RubyLLM::MCP::Requests::ResourceRead.new(self, **args).call
+      end
+
+      def completion(**args)
+        RubyLLM::MCP::Requests::Completion.new(self, **args).call
       end
 
       private
@@ -71,23 +80,23 @@ module RubyLLM
       end
 
       def notification_request
-        @notification_response = RubyLLM::MCP::Requests::Notification.new(self).call
+        RubyLLM::MCP::Requests::Notification.new(self).call
       end
 
       def tool_list_request
-        @tool_request = RubyLLM::MCP::Requests::ToolList.new(self).call
+        RubyLLM::MCP::Requests::ToolList.new(self).call
       end
 
-      def execute_tool_request(name:, parameters:)
-        @execute_tool_response = RubyLLM::MCP::Requests::ToolCall.new(self, name: name, parameters: parameters).call
+      def execute_tool_request(**args)
+        RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
       end
 
       def resources_list_request
-        @resources_request = RubyLLM::MCP::Requests::ResourceList.new(self).call
+        RubyLLM::MCP::Requests::ResourceList.new(self).call
       end
 
       def resource_template_list_request
-        @resource_template_list_response = RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
+        RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
       end
 
       def fetch_and_create_tools
@@ -99,12 +108,12 @@ module RubyLLM
         end
       end
 
-      def fetch_and_create_resources
+      def fetch_and_create_resources(set_as_template: false)
         resources_response = resources_list_request
         resources_response = resources_response["result"]["resources"]
 
         @resources = resources_response.map do |resource|
-          RubyLLM::MCP::Resource.new(self, resource)
+          RubyLLM::MCP::Resource.new(self, resource, template: set_as_template)
         end
       end
     end
