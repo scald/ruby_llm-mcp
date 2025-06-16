@@ -5,18 +5,29 @@ module RubyLLM
     module Providers
       module OpenAI
         module ComplexParameterSupport
-          def param_schema(param)
-            format = {
-              type: param.type,
-              description: param.description
-            }.compact
+          module_function
 
-            if param.type == "array"
-              format[:items] = param.items
-            elsif param.type == "object"
-              format[:properties] = param.properties.transform_values { |value| param_schema(value) }
-            end
-            format
+          def param_schema(param)
+            properties = case param.type
+                         when :array
+                           {
+                             type: param.type,
+                             items: { type: param.item_type }
+                           }
+                         when :object
+                           {
+                             type: param.type,
+                             properties: param.properties.transform_values { |value| param_schema(value) },
+                             required: param.properties.select { |_, p| p.required }.keys
+                           }
+                         else
+                           {
+                             type: param.type,
+                             description: param.description
+                           }
+                         end
+
+            properties.compact
           end
         end
       end
