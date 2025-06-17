@@ -2,16 +2,19 @@
 
 Aiming to make using MCP with RubyLLM as easy as possible.
 
-This project is a Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), designed to work seamlessly with [RubyLLM](https://github.com/patvice/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools as part of LLM conversations.
+This project is a Ruby client for the [Model Context Protocol (MCP)](https://modelcontextprotocol.io/), designed to work seamlessly with [RubyLLM](https://github.com/crmne/ruby_llm). This gem enables Ruby applications to connect to MCP servers and use their tools, resources and prompts as part of LLM conversations.
 
-**Note:** This project is still under development and the API is subject to change. Currently supports the connecting workflow, tool lists and tool execution.
+**Note:** This project is still under development and the API is subject to change.
 
 ## Features
 
 - 🔌 **Multiple Transport Types**: Support for SSE (Server-Sent Events), Streamable HTTP, and stdio transports
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
+- 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
+- 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
 - 🔄 **Real-time Communication**: Efficient bidirectional communication with MCP servers
-- 🎯 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
+- 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
+- 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 
 ## Installation
 
@@ -50,7 +53,7 @@ end
 # Connect to an MCP server via SSE
 client = RubyLLM::MCP.client(
   name: "my-mcp-server",
-  transport_type: "sse",
+  transport_type: :sse,
   config: {
     url: "http://localhost:9292/mcp/sse"
   }
@@ -59,7 +62,7 @@ client = RubyLLM::MCP.client(
 # Or connect via stdio
 client = RubyLLM::MCP.client(
   name: "my-mcp-server",
-  transport_type: "stdio",
+  transport_type: :stdio,
   config: {
     command: "node",
     args: ["path/to/mcp-server.js"],
@@ -70,7 +73,7 @@ client = RubyLLM::MCP.client(
 # Or connect via streamable HTTP
 client = RubyLLM::MCP.client(
   name: "my-mcp-server",
-  transport_type: :streamable",
+  transport_type: :streamable,
   config: {
     url: "http://localhost:8080/mcp",
     headers: { "Authorization" => "Bearer your-token" }
@@ -137,6 +140,142 @@ result = client.execute_tool(
 )
 
 puts result
+```
+
+### Working with Resources
+
+MCP servers can provide access to resources - structured data that can be included in conversations. Resources come in two types: normal resources and resource templates.
+
+#### Normal Resources
+
+```ruby
+# Get available resources from the MCP server
+resources = client.resources
+puts "Available resources:"
+resources.each do |name, resource|
+  puts "- #{name}: #{resource.description}"
+end
+
+# Access a specific resource
+file_resource = resources["project_readme"]
+content = file_resource.content
+puts "Resource content: #{content}"
+
+# Include a resource in a chat conversation for reference with an LLM
+chat = RubyLLM.chat(model: "gpt-4")
+chat.with_resource(file_resource)
+
+# Or add a resource directly to the conversation
+file_resource.include(chat)
+
+response = chat.ask("Can you summarize this README file?")
+puts response
+```
+
+#### Resource Templates
+
+Resource templates are parameterized resources that can be dynamically configured:
+
+```ruby
+# Get available resource templates
+templates = client.resource_templates
+log_template = templates["application_logs"]
+
+# Use a template with parameters
+chat = RubyLLM.chat(model: "gpt-4")
+chat.with_resource(log_template, arguments: {
+  date: "2024-01-15",
+  level: "error"
+})
+
+response = chat.ask("What errors occurred on this date?")
+puts response
+
+# You can also get templated content directly
+content = log_template.content(arguments: {
+  date: "2024-01-15",
+  level: "error"
+})
+puts content
+```
+
+#### Resource Argument Completion
+
+For resource templates, you can get suggested values for arguments:
+
+```ruby
+template = client.resource_templates["user_profile"]
+
+# Search for possible values for a specific argument
+suggestions = template.arguments_search("username", "john")
+puts "Suggested usernames:"
+suggestions.arg_values.each do |value|
+  puts "- #{value}"
+end
+puts "Total matches: #{suggestions.total}"
+puts "Has more: #{suggestions.has_more}"
+```
+
+### Working with Prompts
+
+MCP servers can provide predefined prompts that can be used in conversations:
+
+```ruby
+# Get available prompts from the MCP server
+prompts = client.prompts
+puts "Available prompts:"
+prompts.each do |name, prompt|
+  puts "- #{name}: #{prompt.description}"
+  prompt.arguments.each do |arg|
+    puts "  - #{arg.name}: #{arg.description} (required: #{arg.required})"
+  end
+end
+
+# Use a prompt in a conversation
+greeting_prompt = prompts["daily_greeting"]
+chat = RubyLLM.chat(model: "gpt-4")
+
+# Method 1: Ask prompt directly
+response = chat.ask_prompt(greeting_prompt, arguments: { name: "Alice", time: "morning" })
+puts response
+
+# Method 2: Add prompt to chat and then ask
+chat.with_prompt(greeting_prompt, arguments: { name: "Alice", time: "morning" })
+response = chat.ask("Continue with the greeting")
+```
+
+### Combining Resources, Prompts, and Tools
+
+You can combine all MCP features for powerful conversations:
+
+```ruby
+client = RubyLLM::MCP.client(
+  name: "development-assistant",
+  transport_type: :sse,
+  config: { url: "http://localhost:9292/mcp/sse" }
+)
+
+chat = RubyLLM.chat(model: "gpt-4")
+
+# Add tools for capabilities
+chat.with_tools(*client.tools)
+
+# Add resources for context
+chat.with_resource(client.resources["project_structure"])
+chat.with_resource(
+  client.resource_templates["recent_commits"],
+  arguments: { days: 7 }
+)
+
+# Add prompts for guidance
+chat.with_prompt(
+  client.prompts["code_review_checklist"],
+  arguments: { focus: "security" }
+)
+
+# Now ask for analysis
+response = chat.ask("Please review the recent commits using the checklist and suggest improvements")
+puts response
 ```
 
 ## Transport Types
