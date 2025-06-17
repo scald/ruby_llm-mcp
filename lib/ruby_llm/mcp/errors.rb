@@ -17,6 +17,10 @@ module RubyLLM
       class SessionExpiredError < BaseError; end
 
       class TimeoutError < BaseError; end
+
+      class PromptArgumentError < BaseError; end
+
+      class CompletionNotAvailable < BaseError; end
     end
   end
 end

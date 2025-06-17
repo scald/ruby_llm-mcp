@@ -55,13 +55,13 @@ module RubyLLM
         @resource_templates ||= fetch_and_create_resources(set_as_template: true)
       end
 
-      def execute_tool(name:, parameters:)
-        response = execute_tool_request(name: name, parameters: parameters)
-        result = response["result"]
-        # TODO: handle tool error when "isError" is true in result
-        #
-        # TODO: Implement "type": "image" and "type": "resource"
-        result["content"].map { |content| content["text"] }.join("\n")
+      def prompts(refresh: false)
+        @prompts = nil if refresh
+        @prompts ||= fetch_and_create_prompts
+      end
+
+      def execute_tool(**args)
+        RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
       end
 
       def resource_read_request(**args)
@@ -70,6 +70,10 @@ module RubyLLM
 
       def completion(**args)
         RubyLLM::MCP::Requests::Completion.new(self, **args).call
+      end
+
+      def execute_prompt(**args)
+        RubyLLM::MCP::Requests::PromptCall.new(self, **args).call
       end
 
       private
@@ -87,16 +91,16 @@ module RubyLLM
         RubyLLM::MCP::Requests::ToolList.new(self).call
       end
 
-      def execute_tool_request(**args)
-        RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
-      end
-
       def resources_list_request
         RubyLLM::MCP::Requests::ResourceList.new(self).call
       end
 
       def resource_template_list_request
         RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
+      end
+
+      def prompt_list_request
+        RubyLLM::MCP::Requests::PromptList.new(self).call
       end
 
       def fetch_and_create_tools
@@ -112,9 +116,30 @@ module RubyLLM
         resources_response = resources_list_request
         resources_response = resources_response["result"]["resources"]
 
-        @resources = resources_response.map do |resource|
-          RubyLLM::MCP::Resource.new(self, resource, template: set_as_template)
+        resources = {}
+        resources_response.each do |resource|
+          new_resource = RubyLLM::MCP::Resource.new(self, resource, template: set_as_template)
+          resources[new_resource.name] = new_resource
         end
+
+        resources
+      end
+
+      def fetch_and_create_prompts
+        prompts_response = prompt_list_request
+        prompts_response = prompts_response["result"]["prompts"]
+
+        prompts = {}
+        prompts_response.each do |prompt|
+          new_prompt = RubyLLM::MCP::Prompt.new(self,
+                                                name: prompt["name"],
+                                                description: prompt["description"],
+                                                arguments: prompt["arguments"])
+
+          prompts[new_prompt.name] = new_prompt
+        end
+
+        prompts
       end
     end
   end
