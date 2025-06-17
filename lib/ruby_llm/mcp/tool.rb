@@ -15,10 +15,12 @@ module RubyLLM
       end
 
       def execute(**params)
-        @mcp_client.execute_tool(
+        response = @mcp_client.execute_tool(
           name: @name,
           parameters: params
         )
+
+        create_content_for_message(response.dig("result", "content", 0))
       end
 
       private
@@ -44,6 +46,19 @@ module RubyLLM
         end
 
         params
+      end
+
+      def create_content_for_message(content)
+        case content["type"]
+        when "text"
+          MCP::Content.new(text: content["text"])
+        when "image", "audio"
+          attachment = MCP::Attachment.new(content["content"], content["mime_type"])
+          MCP::Content.new(text: nil, attachments: [attachment])
+        when "resource"
+          resource = Resource.new(mcp_client, content["resource"])
+          resource.to_content
+        end
       end
     end
   end
