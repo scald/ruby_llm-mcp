@@ -7,6 +7,7 @@ require_relative "chat"
 loader = Zeitwerk::Loader.for_gem_extension(RubyLLM)
 loader.inflector.inflect("mcp" => "MCP")
 loader.inflector.inflect("sse" => "SSE")
+loader.inflector.inflect("openai" => "OpenAI")
 loader.setup
 
 module RubyLLM
@@ -18,7 +19,7 @@ module RubyLLM
     end
 
     def support_complex_parameters!
-      require_relative "mcp/providers/open_ai/complex_parameter_support"
+      require_relative "mcp/providers/openai/complex_parameter_support"
       require_relative "mcp/providers/anthropic/complex_parameter_support"
       require_relative "mcp/providers/gemini/complex_parameter_support"
     end
