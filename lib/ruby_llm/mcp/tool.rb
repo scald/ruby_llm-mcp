@@ -20,7 +20,12 @@ module RubyLLM
           parameters: params
         )
 
-        create_content_for_message(response.dig("result", "content", 0))
+        text_values = response.dig("result", "content").map { |content| content["text"] }.compact.join("\n")
+        if text_values.empty?
+          create_content_for_message(response.dig("result", "content", 0))
+        else
+          create_content_for_message({ type: "text", text: text_values })
+        end
       end
 
       private
