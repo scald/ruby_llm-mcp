@@ -262,7 +262,7 @@ RSpec.describe RubyLLM::MCP::Client do
     end
 
     it "concatenates the results" do
-      expect(execute_tool).to eq "line 1\nline 2"
+      expect(execute_tool).to eq({ "result" => { "content" => [{ "text" => "line 1" }, { "text" => "line 2" }] } })
     end
   end
 end

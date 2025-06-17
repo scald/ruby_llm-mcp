@@ -11,20 +11,50 @@ module RubyLLM
         @name = resource["name"]
         @description = resource["description"]
         @mime_type = resource["mimeType"]
+        @content = resource["content"] || nil
         @template = template
       end
 
-      def content(parsable_information: {})
+      def content(arguments: {})
+        return @content if @content && !template?
+
         response = if template?
-                     templated_uri = apply_template(@uri, parsable_information)
+                     templated_uri = apply_template(@uri, arguments)
 
                      read_response(uri: templated_uri)
                    else
                      read_response
                    end
 
-        response.dig("result", "contents", 0, "text") ||
-          response.dig("result", "contents", 0, "blob")
+        content = response.dig("result", "contents", 0)
+        @type = if content.key?("type")
+                  content["type"]
+                else
+                  "text"
+                end
+
+        @content = content["text"] || content["blob"]
+      end
+
+      def include(chat, **args)
+        message = Message.new(
+          role: "user",
+          content: to_content(**args)
+        )
+
+        chat.add_message(message)
+      end
+
+      def to_content(arguments: {})
+        content = content(arguments: arguments)
+
+        case @type
+        when "text"
+          MCP::Content.new(content)
+        when "blob"
+          attachment = MCP::Attachment.new(content, mime_type)
+          MCP::Content.new(text: "#{name}: #{description}", attachments: [attachment])
+        end
       end
 
       def arguments_search(argument, value)
@@ -32,10 +62,9 @@ module RubyLLM
           response = @mcp_client.completion(type: :resource, name: @name, argument: argument, value: value)
           response = response.dig("result", "completion")
 
-          Struct.new(:arg_values, :total, :has_more)
-                .new(response["values"], response["total"], response["hasMore"])
+          Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
         else
-          []
+          raise Errors::CompletionNotAvailable, "Completion is not available for this MCP server"
         end
       end
 
@@ -60,9 +89,9 @@ module RubyLLM
         { "result" => { "contents" => [{ "text" => response.body }] } }
       end
 
-      def apply_template(uri, parsable_information)
+      def apply_template(uri, arguments)
         uri.gsub(/\{(\w+)\}/) do
-          parsable_information[::Regexp.last_match(1).to_sym] || "{#{::Regexp.last_match(1)}}"
+          arguments[::Regexp.last_match(1).to_sym] || "{#{::Regexp.last_match(1)}}"
         end
       end
     end

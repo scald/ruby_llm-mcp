@@ -2,6 +2,7 @@
 
 require "ruby_llm"
 require "zeitwerk"
+require_relative "chat"
 
 loader = Zeitwerk::Loader.for_gem_extension(RubyLLM)
 loader.inflector.inflect("mcp" => "MCP")
