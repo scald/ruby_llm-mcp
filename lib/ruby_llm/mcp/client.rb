@@ -40,6 +40,10 @@ module RubyLLM
         @transport.request(body, **options)
       end
 
+      def stop
+        @transport.close
+      end
+
       def tools(refresh: false)
         @tools = nil if refresh
         @tools ||= fetch_and_create_tools

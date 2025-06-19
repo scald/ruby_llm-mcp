@@ -244,7 +244,7 @@ module RubyLLM
 
         def process_sse_events(sse_body)
           event_buffer = ""
-          event_id = nil
+          # event_id = nil
 
           sse_body.each_line do |line|
             line = line.strip

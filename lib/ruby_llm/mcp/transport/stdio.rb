@@ -23,6 +23,7 @@ module RubyLLM
           @pending_mutex = Mutex.new
           @running = true
           @reader_thread = nil
+          @stderr_thread = nil
 
           start_process
         end
@@ -62,7 +63,7 @@ module RubyLLM
           end
         end
 
-        def close
+        def close # rubocop:disable Metrics/MethodLength
           @running = false
 
           begin
@@ -82,6 +83,7 @@ module RubyLLM
           rescue StandardError
             nil
           end
+
           begin
             @stderr&.close
           rescue StandardError
@@ -94,11 +96,18 @@ module RubyLLM
             nil
           end
 
+          begin
+            @stderr_thread&.join(1)
+          rescue StandardError
+            nil
+          end
+
           @stdin = nil
           @stdout = nil
           @stderr = nil
           @wait_thread = nil
           @reader_thread = nil
+          @stderr_thread = nil
         end
 
         private
@@ -113,6 +122,7 @@ module RubyLLM
                                                    end
 
           start_reader_thread
+          start_stderr_thread
         end
 
         def restart_process
@@ -146,6 +156,32 @@ module RubyLLM
           end
 
           @reader_thread.abort_on_exception = true
+        end
+
+        def start_stderr_thread
+          @stderr_thread = Thread.new do
+            while @running
+              begin
+                if @stderr.closed? || @wait_thread.nil? || !@wait_thread.alive?
+                  sleep 1
+                  next
+                end
+
+                line = @stderr.gets
+                next unless line && !line.strip.empty?
+
+                puts "STDERR: #{line.strip}"
+              rescue IOError, Errno::EPIPE => e
+                puts "Stderr reader error: #{e.message}"
+                sleep 1
+              rescue StandardError => e
+                puts "Error in stderr thread: #{e.message}"
+                sleep 1
+              end
+            end
+          end
+
+          @stderr_thread.abort_on_exception = true
         end
 
         def process_response(line)
