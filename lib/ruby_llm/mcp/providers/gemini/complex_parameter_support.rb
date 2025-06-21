@@ -19,15 +19,29 @@ module RubyLLM
           def build_properties(param)
             properties = case param.type
                          when :array
-                           {
-                             type: param_type_for_gemini(param.type),
-                             items: { type: param_type_for_gemini(param.item_type) }
-                           }
+                           if param.item_type == :object
+                             {
+                               type: param_type_for_gemini(param.type),
+                               items: {
+                                 type: param_type_for_gemini(param.item_type),
+                                 properties: param.properties.transform_values { |value| build_properties(value) }
+                               }
+                             }
+                           else
+                             {
+                               type: param_type_for_gemini(param.type),
+                               items: { type: param_type_for_gemini(param.item_type), enum: param.enum }.compact
+                             }
+                           end
                          when :object
                            {
                              type: param_type_for_gemini(param.type),
                              properties: param.properties.transform_values { |value| build_properties(value) },
                              required: param.properties.select { |_, p| p.required }.keys
+                           }
+                         when :union
+                           {
+                             param.union_type => param.properties.map { |properties| clean_parameters(properties) }
                            }
                          else
                            {

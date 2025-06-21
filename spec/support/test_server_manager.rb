@@ -4,7 +4,7 @@ class TestServerManager
   @server_pid = nil
 
   COMMAND = "bun"
-  ARGS = "spec/support/server/src/index.ts"
+  ARGS = "spec/fixtures/typescript-mcp/index.ts"
   FLAGS = ["--silent"].freeze
 
   class << self

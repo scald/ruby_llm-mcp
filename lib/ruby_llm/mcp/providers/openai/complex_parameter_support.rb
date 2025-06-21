@@ -10,15 +10,29 @@ module RubyLLM
           def param_schema(param)
             properties = case param.type
                          when :array
-                           {
-                             type: param.type,
-                             items: { type: param.item_type }
-                           }
+                           if param.item_type == :object
+                             {
+                               type: param.type,
+                               items: {
+                                 type: param.item_type,
+                                 properties: param.properties.transform_values { |value| param_schema(value) }
+                               }
+                             }
+                           else
+                             {
+                               type: param.type,
+                               items: { type: param.item_type, enum: param.enum }.compact
+                             }
+                           end
                          when :object
                            {
                              type: param.type,
                              properties: param.properties.transform_values { |value| param_schema(value) },
                              required: param.properties.select { |_, p| p.required }.keys
+                           }
+                         when :union
+                           {
+                             param.union_type => param.properties.map { |property| param_schema(property) }
                            }
                          else
                            {

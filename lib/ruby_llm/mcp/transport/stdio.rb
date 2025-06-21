@@ -11,7 +11,8 @@ module RubyLLM
       class Stdio
         attr_reader :command, :stdin, :stdout, :stderr, :id
 
-        def initialize(command, args: [], env: {})
+        def initialize(command, request_timeout:, args: [], env: {})
+          @request_timeout = request_timeout
           @command = command
           @args = args
           @env = env || {}
@@ -54,13 +55,17 @@ module RubyLLM
           return unless wait_for_response
 
           begin
-            Timeout.timeout(30) do
+            Timeout.timeout(@request_timeout / 1000) do
               response_queue.pop
             end
           rescue Timeout::Error
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise RubyLLM::MCP::Errors::TimeoutError.new(message: "Request timed out after 30 seconds")
+            raise RubyLLM::MCP::Errors::TimeoutError.new(message: "Request timed out after #{@request_timeout / 1000} seconds")
           end
+        end
+
+        def alive?
+          @running
         end
 
         def close # rubocop:disable Metrics/MethodLength
@@ -118,7 +123,7 @@ module RubyLLM
           @stdin, @stdout, @stderr, @wait_thread = if @env.empty?
                                                      Open3.popen3(@command, *@args)
                                                    else
-                                                     Open3.popen3(environment_string, @command, *@args)
+                                                     Open3.popen3(@env, @command, *@args)
                                                    end
 
           start_reader_thread
@@ -185,11 +190,7 @@ module RubyLLM
         end
 
         def process_response(line)
-          response = begin
-            JSON.parse(line)
-          rescue JSON::ParserError => e
-            raise "Error parsing response as JSON: #{e.message}\nRaw response: #{line}"
-          end
+          response = JSON.parse(line)
           request_id = response["id"]&.to_s
 
           @pending_mutex.synchronize do
@@ -198,10 +199,8 @@ module RubyLLM
               response_queue&.push(response)
             end
           end
-        end
-
-        def environment_string
-          @env.map { |key, value| "#{key}=#{value}" }.join(" ")
+        rescue JSON::ParserError => e
+          RubyLLM.logger.error("Error parsing response as JSON: #{e.message}\nRaw response: #{line}")
         end
       end
     end

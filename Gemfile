@@ -19,3 +19,5 @@ group :development do
   gem "simplecov"
   gem "vcr"
 end
+
+gem "webmock", "~> 3.25"

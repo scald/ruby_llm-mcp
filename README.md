@@ -204,10 +204,10 @@ puts content
 For resource templates, you can get suggested values for arguments:
 
 ```ruby
-template = client.resource_templates["user_profile"]
+template = client.resource("user_profile")
 
 # Search for possible values for a specific argument
-suggestions = template.arguments_search("username", "john")
+suggestions = template.complete("username", "john")
 puts "Suggested usernames:"
 suggestions.arg_values.each do |value|
   puts "- #{value}"
@@ -232,7 +232,7 @@ prompts.each do |name, prompt|
 end
 
 # Use a prompt in a conversation
-greeting_prompt = prompts["daily_greeting"]
+greeting_prompt = client.prompt("daily_greeting")
 chat = RubyLLM.chat(model: "gpt-4")
 
 # Method 1: Ask prompt directly
@@ -261,15 +261,15 @@ chat = RubyLLM.chat(model: "gpt-4")
 chat.with_tools(*client.tools)
 
 # Add resources for context
-chat.with_resource(client.resources["project_structure"])
+chat.with_resource(client.resource("project_structure"))
 chat.with_resource(
-  client.resource_templates["recent_commits"],
+  client.resource_template("recent_commits"),
   arguments: { days: 7 }
 )
 
 # Add prompts for guidance
 chat.with_prompt(
-  client.prompts["code_review_checklist"],
+  client.prompt("code_review_checklist"),
   arguments: { focus: "security" }
 )
 

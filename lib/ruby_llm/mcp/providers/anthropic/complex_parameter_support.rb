@@ -20,15 +20,26 @@ module RubyLLM
           def build_properties(param)
             case param.type
             when :array
-              {
-                type: param.type,
-                items: { type: param.item_type }
-              }
+              if param.item_type == :object
+                {
+                  type: param.type,
+                  items: { type: param.item_type, properties: clean_parameters(param.properties) }
+                }
+              else
+                {
+                  type: param.type,
+                  items: { type: param.item_type, enum: param.enum }.compact
+                }
+              end
             when :object
               {
                 type: param.type,
                 properties: clean_parameters(param.properties),
                 required: required_parameters(param.properties)
+              }
+            when :union
+              {
+                param.union_type => param.properties.map { |properties| clean_parameters(properties) }
               }
             else
               {

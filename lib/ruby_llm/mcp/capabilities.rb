@@ -3,9 +3,9 @@
 module RubyLLM
   module MCP
     class Capabilities
-      attr_reader :capabilities
+      attr_accessor :capabilities
 
-      def initialize(capabilities)
+      def initialize(capabilities = {})
         @capabilities = capabilities
       end
 
@@ -22,7 +22,7 @@ module RubyLLM
       end
 
       def completion?
-        @capabilities["completion"].present?
+        !@capabilities["completions"].nil?
       end
     end
   end

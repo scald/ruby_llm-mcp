@@ -19,10 +19,11 @@ module RubyLLM
         @mcp_client = mcp_client
         @name = name
         @description = description
+        @arguments = parse_arguments(arguments)
+      end
 
-        @arguments = arguments.map do |arg|
-          Argument.new(name: arg["name"], description: arg["description"], required: arg["required"])
-        end
+      def fetch(arguments = {})
+        fetch_prompt_messages(arguments)
       end
 
       def include(chat, arguments: {})
@@ -41,14 +42,14 @@ module RubyLLM
 
       alias say ask
 
-      def arguments_search(argument, value)
+      def complete(argument, value)
         if @mcp_client.capabilities.completion?
-          response = @mcp_client.completion(type: :prompt, name: @name, argument: argument, value: value)
+          response = @mcp_client.completion_prompt(name: @name, argument: argument, value: value)
           response = response.dig("result", "completion")
 
           Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
         else
-          raise Errors::CompletionNotAvailable, "Completion is not available for this MCP server"
+          raise Errors::CompletionNotAvailable.new(message: "Completion is not available for this MCP server")
         end
       end
 
@@ -88,6 +89,16 @@ module RubyLLM
         when "resource"
           resource = Resource.new(mcp_client, content["resource"])
           resource.to_content
+        end
+      end
+
+      def parse_arguments(arguments)
+        if arguments.nil?
+          []
+        else
+          arguments.map do |arg|
+            Argument.new(name: arg["name"], description: arg["description"], required: arg["required"])
+          end
         end
       end
     end

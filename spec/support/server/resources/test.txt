@@ -1,3 +1,0 @@
-Hello, this is a test file!
-This content will be served by the MCP resource.
-You can modify this file and it will be cached for 5 minutes.

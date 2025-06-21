@@ -1,0 +1,78 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.openai.com/v1/chat/completions
+    body:
+      encoding: UTF-8
+      string: '{"model":"gpt-4.1","messages":[{"role":"user","content":"Can you write
+        me a beautiful poem about the current day?"}],"stream":false,"temperature":0.7}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      Authorization:
+      - Bearer <OPENAI_API_KEY>
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sat, 21 Jun 2025 14:53:05 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Access-Control-Expose-Headers:
+      - X-Request-ID
+      Openai-Organization:
+      - "<OPENAI_ORGANIZATION>"
+      Openai-Processing-Ms:
+      - '2942'
+      Openai-Version:
+      - '2020-10-01'
+      X-Envoy-Upstream-Service-Time:
+      - '2950'
+      X-Ratelimit-Limit-Requests:
+      - '500'
+      X-Ratelimit-Limit-Tokens:
+      - '30000'
+      X-Ratelimit-Remaining-Requests:
+      - '499'
+      X-Ratelimit-Remaining-Tokens:
+      - '29984'
+      X-Ratelimit-Reset-Requests:
+      - 120ms
+      X-Ratelimit-Reset-Tokens:
+      - 32ms
+      X-Request-Id:
+      - "<X_REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Cf-Cache-Status:
+      - DYNAMIC
+      Set-Cookie:
+      - "<COOKIE>"
+      - "<COOKIE>"
+      X-Content-Type-Options:
+      - nosniff
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+      Alt-Svc:
+      - h3=":443"; ma=86400
+    body:
+      encoding: ASCII-8BIT
+      string: !binary |-
+        ewogICJpZCI6ICJjaGF0Y21wbC1Ca3RzVXh0MzBEYTZINzZucnJMMUEzSFoybU92byIsCiAgIm9iamVjdCI6ICJjaGF0LmNvbXBsZXRpb24iLAogICJjcmVhdGVkIjogMTc1MDUxNzU4MiwKICAibW9kZWwiOiAiZ3B0LTQuMS0yMDI1LTA0LTE0IiwKICAiY2hvaWNlcyI6IFsKICAgIHsKICAgICAgImluZGV4IjogMCwKICAgICAgIm1lc3NhZ2UiOiB7CiAgICAgICAgInJvbGUiOiAiYXNzaXN0YW50IiwKICAgICAgICAiY29udGVudCI6ICJDZXJ0YWlubHkhIEhlcmXigJlzIGEgcG9lbSBhYm91dCB0b2RheTpcblxuLS0tXG5cbioqVGhpcyBEYXksIFVuZm9sZGluZyoqXG5cbk1vcm5pbmcgc3BpbGxzIGl0cyBnZW50bGUgZ29sZCwgIFxuVG9kYXkgaXMgYm9ybiwgYSBzdG9yeSB0b2xkICBcbkluIGRldy1icmlnaHQgZ3Jhc3MgYW5kIHdha2luZyBsaWdodCwgIFxuU29mdCBhcyBob3BlLCBhbmQganVzdCBhcyBicmlnaHQuXG5cbk91dHNpZGUsIHRoZSB3b3JsZCBpbiBxdWlldCB0dW5lICBcbkJyZWF0aGVzIGluIHRoZSB3YXJtdGggb2YgZWFybHkgSnVuZS4gIFxuQ2xvdWRzIGRyaWZ0IHdpdGggaWRsZSwgdGhvdWdodGZ1bCBncmFjZeKAlCAgXG5BIGNhbnZhcyBza3ksIGEgZHJlYW1pbmcgcGxhY2UuXG5cbkVhY2ggaG91ciwgYSBwZXRhbCwgbmV3bHkgZ3Jvd24sICBcbkEgbW9tZW504oCZcyBzY2VudCwgdW5pcXVlbHkga25vd24uICBcbkJpcmRzb25nIGRhbmNlcyBvbiB0aGUgYWlyLCAgXG5BIHByb21pc2Ugd2hpc3BlcmVkIGV2ZXJ5d2hlcmUuXG5cbldlIGxpdmUgdG9kYXnigJRubyBvdGhlciBkYXkgIFxuV2FzIGV2ZXIgc2hhcGVkIHF1aXRlIGluIHRoaXMgd2F5LiAgXG5MZXTigJlzIHdhbGsgaXQgc2xvdywgYW5kIGxldCBpdCBiZSAgXG5BIGdlbnRsZSwgZmxlZXRpbmcgbWVtb3J5LlxuXG5TbyBoZXJl4oCZcyB0byBub3csIHRoaXMgZnJhZ2lsZSBnaWZ0OiAgXG5TdW4gb24gdGhlIGJyb3csIHNwaXJpdHMgbGlmdC4gIFxuVGhlIHByZXNlbnQsIHNoaW5pbmcsIGxpa2UgYSBzdHJlYW3igJQgIFxuVG9kYXkgaXMgcmVhbCwgYW5kIG91cnMgdG8gZHJlYW0uIiwKICAgICAgICAicmVmdXNhbCI6IG51bGwsCiAgICAgICAgImFubm90YXRpb25zIjogW10KICAgICAgfSwKICAgICAgImxvZ3Byb2JzIjogbnVsbCwKICAgICAgImZpbmlzaF9yZWFzb24iOiAic3RvcCIKICAgIH0KICBdLAogICJ1c2FnZSI6IHsKICAgICJwcm9tcHRfdG9rZW5zIjogMTksCiAgICAiY29tcGxldGlvbl90b2tlbnMiOiAxOTUsCiAgICAidG90YWxfdG9rZW5zIjogMjE0LAogICAgInByb21wdF90b2tlbnNfZGV0YWlscyI6IHsKICAgICAgImNhY2hlZF90b2tlbnMiOiAwLAogICAgICAiYXVkaW9fdG9rZW5zIjogMAogICAgfSwKICAgICJjb21wbGV0aW9uX3Rva2Vuc19kZXRhaWxzIjogewogICAgICAicmVhc29uaW5nX3Rva2VucyI6IDAsCiAgICAgICJhdWRpb190b2tlbnMiOiAwLAogICAgICAiYWNjZXB0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwLAogICAgICAicmVqZWN0ZWRfcHJlZGljdGlvbl90b2tlbnMiOiAwCiAgICB9CiAgfSwKICAic2VydmljZV90aWVyIjogImRlZmF1bHQiLAogICJzeXN0ZW1fZmluZ2VycHJpbnQiOiAiZnBfNTFlMTA3MGNmMiIKfQo=
+  recorded_at: Sat, 21 Jun 2025 14:53:05 GMT
+recorded_with: VCR 6.3.1

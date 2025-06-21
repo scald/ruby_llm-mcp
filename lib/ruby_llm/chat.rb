@@ -10,8 +10,14 @@ module RubyLLM
       self
     end
 
-    def with_resource(resource, **args)
-      resource.include(self, **args)
+    def with_resource(resource)
+      resource.include(self)
+      self
+    end
+
+    def with_resource_template(resource_template, arguments: {})
+      resource = resource_template.fetch_resource(arguments: arguments)
+      resource.include(self)
       self
     end
 

@@ -18,7 +18,7 @@ RubyLLM::MCP.support_complex_parameters!
 #   name: "filesystem",
 #   transport_type: :stdio,
 #   config: {
-#     command: "npx",
+#     command: "bunx",
 #     args: [
 #       "@modelcontextprotocol/server-filesystem",
 #       File.expand_path("..", __dir__) # Allow access to the current directory
@@ -27,15 +27,27 @@ RubyLLM::MCP.support_complex_parameters!
 # )
 
 # Test with filesystem MCP server using stdio transport
+# client = RubyLLM::MCP.client(
+#   name: "filesystem",
+#   transport_type: :stdio,
+#   config: {
+#     command: "bun",
+#     args: [
+#       "./spec/fixtures/typescript-mcp/index.ts",
+#       "--stdio"
+#     ]
+#   }
+# )
+
 client = RubyLLM::MCP.client(
-  name: "filesystem",
+  name: "firecrawl-mcp",
   transport_type: :stdio,
   config: {
-    command: "bun",
-    args: [
-      "./spec/support/server/src/index.ts",
-      "--stdio"
-    ]
+    command: "npx",
+    args: ["-y", "firecrawl-mcp"],
+    env: {
+      "FIRECRAWL_API_KEY" => ENV.fetch("FIRECRAWL_API_KEY", nil)
+    }
   }
 )
 
@@ -44,25 +56,26 @@ puts "Transport type: #{File.expand_path('..', __dir__)}"
 puts "Connected to filesystem MCP server"
 puts "Available tools:"
 tools = client.tools
-puts tools.map { |tool| "  - #{tool.name}: #{tool.description}" }.join("\n")
+puts tools.map(&:name).join("\n")
 puts "-" * 50
 
-# chat = RubyLLM.chat(model: "gpt-4.1")
-# chat.with_tools(*client.tools)
+tool = client.tool("firecrawl_crawl")
+chat = RubyLLM.chat(model: "gpt-4.1")
+chat.with_tool(tool)
 
-# message = "Can you list the files in the current directory and tell me what's in the README file if it exists?"
-# puts "Asking: #{message}"
-# puts "-" * 50
+message = "Can you crawl the website http://www.fullscript.com and tell me what fullscript does?"
+puts "Asking: #{message}"
+puts "-" * 50
 
-# chat.ask(message) do |chunk|
-#   if chunk.tool_call?
-#     chunk.tool_calls.each do |key, tool_call|
-#       next if tool_call.name.nil?
+chat.ask(message) do |chunk|
+  if chunk.tool_call?
+    chunk.tool_calls.each do |key, tool_call|
+      next if tool_call.name.nil?
 
-#       puts "\n🔧 Tool call(#{key}) - #{tool_call.name}"
-#     end
-#   else
-#     print chunk.content
-#   end
-# end
-# puts "\n"
+      puts "\n🔧 Tool call(#{key}) - #{tool_call.name}"
+    end
+  else
+    print chunk.content
+  end
+end
+puts "\n"
