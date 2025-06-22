@@ -1,0 +1,183 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
+        http://www.google.com and see if the site say what they do?"}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Sun, 22 Jun 2025 13:07:48 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=574
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "functionCall": {
+                      "name": "fetch_site",
+                      "args": {
+                        "website": "http://www.google.com"
+                      }
+                    }
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.0025617537850683384
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 48,
+            "candidatesTokenCount": 11,
+            "totalTokenCount": 59,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 48
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 11
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "IwBYaK--MPmSmNAP-sXGiQU"
+        }
+  recorded_at: Sun, 22 Jun 2025 13:07:48 GMT
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you fetch the website
+        http://www.google.com and see if the site say what they do?"}]},{"role":"model","parts":[{"functionCall":{"name":"fetch_site","args":{"website":"http://www.google.com"}}}]},{"role":"user","parts":[{"functionResponse":{"name":"00673dd1-8a2c-4684-b125-c93c356a2f4a","response":{"name":"00673dd1-8a2c-4684-b125-c93c356a2f4a","content":"Website
+        content from http://www.google.com:\n\nGoogle Search Images Maps Play YouTube
+        News Gmail Drive More Calendar Translate Books Shopping Blogger Finance Photos
+        Docs Even more &raquo; Account Options Sign in Search settings Web History
+        &nbsp; Advanced search Google offered in: Français Advertising Business Solutions
+        About Google Google.ca &copy; 2025 - Privacy - Terms"}}}]}],"generationConfig":{"temperature":0.7},"tools":[{"functionDeclarations":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","parameters":{"type":"OBJECT","properties":{"website":{"anyOf":[{"type":"STRING"},{"type":"OBJECT","properties":{"url":{"type":"STRING"},"headers":{"type":"ARRAY","items":{"type":"OBJECT","properties":{"name":{"type":"STRING"},"value":{"type":"STRING"}}}}},"required":[]}]}},"required":["website"]}}]}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Sun, 22 Jun 2025 13:07:49 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=810
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "Based on the fetched content, the website www.google.com is a search engine. It also offers services like image search, maps, play store, youtube, news, gmail, drive, calendar, translate, books, shopping, blogger, finance, photos, and docs.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.056950518959446958
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 204,
+            "candidatesTokenCount": 57,
+            "totalTokenCount": 261,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 204
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 57
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "JABYaLatJ_mSmNAP-sXGiQU"
+        }
+  recorded_at: Sun, 22 Jun 2025 13:07:49 GMT
+recorded_with: VCR 6.3.1

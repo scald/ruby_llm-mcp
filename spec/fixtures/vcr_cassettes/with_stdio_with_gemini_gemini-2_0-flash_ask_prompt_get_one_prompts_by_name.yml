@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]}],"generationConfig":{"temperature":0.7}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Sun, 22 Jun 2025 13:07:20 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2043
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The clock ticks soft, a gentle chime,\nUpon the canvas of this time,\nA day unfurls, a brand new scroll,\nTo paint with moments, take control.\n\nThe sun, a painter, starts his quest,\nTo gild the clouds in hues of blessed\nAnd fleeting gold, then washes clean\nThe world below, a vibrant scene.\n\nThe wind, a whisper through the trees,\nA rustling song, a gentle breeze,\nCarries the scent of earth and dew,\nA promise whispered, fresh and new.\n\nThe city wakes, a hum and stir,\nA million dreams begin to blur,\nEach soul a story, yet untold,\nIn silver, bronze, and shades of gold.\n\nA robin sings a morning trill,\nUpon the window's dusty sill,\nA tiny spark of vibrant glee,\nA joyful, simple melody.\n\nSo breathe it in, this present day,\nLet worries gently drift away,\nEmbrace the beauty, big and small,\nAnd find the magic in it all.\n\nFor in this moment, bright and clear,\nA living, breathing **poem** is here,\nWritten in light, in sound, in air,\nA masterpiece beyond compare.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.53235836993859431
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 25,
+            "candidatesTokenCount": 257,
+            "totalTokenCount": 282,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 25
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 257
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "BgBYaOzkO4WT1dkP_cOosQU"
+        }
+  recorded_at: Sun, 22 Jun 2025 13:07:20 GMT
+recorded_with: VCR 6.3.1

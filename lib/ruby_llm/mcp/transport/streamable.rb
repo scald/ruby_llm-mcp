@@ -12,8 +12,9 @@ module RubyLLM
       class Streamable
         attr_reader :headers, :id, :session_id
 
-        def initialize(url, headers: {})
+        def initialize(url, request_timeout:, headers: {})
           @url = url
+          @request_timeout = request_timeout
           @client_id = SecureRandom.uuid
           @session_id = nil
           @base_headers = headers.merge({
@@ -55,6 +56,10 @@ module RubyLLM
           handle_response(response, request_id, response_queue, wait_for_response)
         end
 
+        def alive?
+          @running
+        end
+
         def close
           @running = false
           @sse_mutex.synchronize do
@@ -83,7 +88,7 @@ module RubyLLM
 
         def create_connection
           Faraday.new(url: @url) do |f|
-            f.options.timeout = 300
+            f.options.timeout = @request_timeout / 1000
             f.options.open_timeout = 10
           end
         end
@@ -279,12 +284,14 @@ module RubyLLM
         end
 
         def wait_for_response_with_timeout(request_id, response_queue)
-          Timeout.timeout(30) do
+          Timeout.timeout(@request_timeout / 1000) do
             response_queue.pop
           end
         rescue Timeout::Error
           @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-          raise RubyLLM::MCP::Errors::TimeoutError.new(message: "Request timed out after 30 seconds")
+          raise RubyLLM::MCP::Errors::TimeoutError.new(
+            message: "Request timed out after #{@request_timeout / 1000} seconds"
+          )
         end
       end
     end

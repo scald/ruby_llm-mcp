@@ -40,8 +40,7 @@ module RubyLLM
           start_sse_listener
         end
 
-        # rubocop:disable Metrics/MethodLength
-        def request(body, add_id: true, wait_for_response: true)
+        def request(body, add_id: true, wait_for_response: true) # rubocop:disable Metrics/MethodLength
           # Generate a unique request ID
           if add_id
             @id_mutex.synchronize { @id_counter += 1 }
@@ -60,7 +59,7 @@ module RubyLLM
           # Send the request using Faraday
           begin
             conn = Faraday.new do |f|
-              f.options.timeout = 30
+              f.options.timeout = @request_timeout / 1000
               f.options.open_timeout = 5
             end
 
@@ -83,15 +82,20 @@ module RubyLLM
           return unless wait_for_response
 
           begin
-            Timeout.timeout(30) do
+            Timeout.timeout(@request_timeout / 1000) do
               response_queue.pop
             end
           rescue Timeout::Error
             @pending_mutex.synchronize { @pending_requests.delete(request_id.to_s) }
-            raise RubyLLM::MCP::Errors::TimeoutError.new(message: "Request timed out after 30 seconds")
+            raise RubyLLM::MCP::Errors::TimeoutError.new(
+              message: "Request timed out after #{@request_timeout / 1000} seconds"
+            )
           end
         end
-        # rubocop:enable Metrics/MethodLength
+
+        def alive?
+          @running
+        end
 
         def close
           @running = false

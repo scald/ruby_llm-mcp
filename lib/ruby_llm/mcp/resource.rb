@@ -3,37 +3,26 @@
 module RubyLLM
   module MCP
     class Resource
-      attr_reader :uri, :name, :description, :mime_type, :mcp_client, :template
+      attr_reader :uri, :name, :description, :mime_type, :mcp_client
 
-      def initialize(mcp_client, resource, template: false)
+      def initialize(mcp_client, resource)
         @mcp_client = mcp_client
         @uri = resource["uri"]
         @name = resource["name"]
         @description = resource["description"]
         @mime_type = resource["mimeType"]
-        @content = resource["content"] || nil
-        @template = template
+        if resource.key?("content_response")
+          @content_response = resource["content_response"]
+          @content = @content_response["text"] || @content_response["blob"]
+        end
       end
 
-      def content(arguments: {})
-        return @content if @content && !template?
+      def content
+        return @content unless @content.nil?
 
-        response = if template?
-                     templated_uri = apply_template(@uri, arguments)
-
-                     read_response(uri: templated_uri)
-                   else
-                     read_response
-                   end
-
-        content = response.dig("result", "contents", 0)
-        @type = if content.key?("type")
-                  content["type"]
-                else
-                  "text"
-                end
-
-        @content = content["text"] || content["blob"]
+        response = read_response
+        @content_response = response.dig("result", "contents", 0)
+        @content = @content_response["text"] || @content_response["blob"]
       end
 
       def include(chat, **args)
@@ -45,34 +34,29 @@ module RubyLLM
         chat.add_message(message)
       end
 
-      def to_content(arguments: {})
-        content = content(arguments: arguments)
+      def to_content
+        content = self.content
 
-        case @type
+        case content_type
         when "text"
-          MCP::Content.new(content)
+          MCP::Content.new(text: "#{name}: #{description}\n\n#{content}")
         when "blob"
           attachment = MCP::Attachment.new(content, mime_type)
           MCP::Content.new(text: "#{name}: #{description}", attachments: [attachment])
         end
       end
 
-      def arguments_search(argument, value)
-        if template? && @mcp_client.capabilities.completion?
-          response = @mcp_client.completion(type: :resource, name: @name, argument: argument, value: value)
-          response = response.dig("result", "completion")
+      private
 
-          Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
+      def content_type
+        return "text" if @content_response.nil?
+
+        if @content_response.key?("blob")
+          "blob"
         else
-          raise Errors::CompletionNotAvailable, "Completion is not available for this MCP server"
+          "text"
         end
       end
-
-      def template?
-        @template
-      end
-
-      private
 
       def read_response(uri: @uri)
         parsed = URI.parse(uri)
@@ -87,12 +71,6 @@ module RubyLLM
       def fetch_uri_content(uri)
         response = Faraday.get(uri)
         { "result" => { "contents" => [{ "text" => response.body }] } }
-      end
-
-      def apply_template(uri, arguments)
-        uri.gsub(/\{(\w+)\}/) do
-          arguments[::Regexp.last_match(1).to_sym] || "{#{::Regexp.last_match(1)}}"
-        end
       end
     end
   end

@@ -10,7 +10,7 @@ module RubyLLM
         @mcp_client = mcp_client
 
         @name = tool_response["name"]
-        @description = tool_response["description"]
+        @description = tool_response["description"].to_s
         @parameters = create_parameters(tool_response["inputSchema"])
       end
 
@@ -21,10 +21,11 @@ module RubyLLM
         )
 
         text_values = response.dig("result", "content").map { |content| content["text"] }.compact.join("\n")
+
         if text_values.empty?
           create_content_for_message(response.dig("result", "content", 0))
         else
-          create_content_for_message({ type: "text", text: text_values })
+          create_content_for_message({ "type" => "text", "text" => text_values })
         end
       end
 
@@ -32,20 +33,16 @@ module RubyLLM
 
       def create_parameters(input_schema)
         params = {}
-        input_schema["properties"].each_key do |key|
-          param = RubyLLM::MCP::Parameter.new(
-            key,
-            type: input_schema["properties"][key]["type"],
-            desc: input_schema["properties"][key]["description"],
-            required: input_schema["properties"][key]["required"]
-          )
+        return params if input_schema["properties"].nil?
 
-          if param.type == "array"
-            param.items = input_schema["properties"][key]["items"]
-          elsif param.type == "object"
-            properties = create_parameters(input_schema["properties"][key]["properties"])
-            param.properties = properties
-          end
+        input_schema["properties"].each_key do |key|
+          param_data = input_schema.dig("properties", key)
+
+          param = if param_data.key?("oneOf") || param_data.key?("anyOf") || param_data.key?("allOf")
+                    process_union_parameter(key, param_data)
+                  else
+                    process_parameter(key, param_data)
+                  end
 
           params[key] = param
         end
@@ -53,15 +50,63 @@ module RubyLLM
         params
       end
 
+      def process_union_parameter(key, param_data)
+        union_type = param_data.keys.first
+        param = RubyLLM::MCP::Parameter.new(
+          key,
+          type: :union,
+          union_type: union_type
+        )
+
+        param.properties = param_data[union_type].map do |value|
+          process_parameter(key, value, lifted_type: param_data["type"])
+        end.compact
+
+        param
+      end
+
+      def process_parameter(key, param_data, lifted_type: nil)
+        param = RubyLLM::MCP::Parameter.new(
+          key,
+          type: param_data["type"] || lifted_type,
+          desc: param_data["description"],
+          required: param_data["required"]
+        )
+
+        if param.type == :array
+          items = param_data["items"]
+          param.items = items
+          if items.key?("properties")
+            param.properties = create_parameters(items)
+          end
+          if param_data.key?("enum")
+            param.enum = param_data["enum"]
+          end
+        elsif param.type == :object
+          if param_data.key?("properties")
+            param.properties = create_parameters(param_data)
+          end
+        end
+
+        param
+      end
+
       def create_content_for_message(content)
         case content["type"]
         when "text"
           MCP::Content.new(text: content["text"])
         when "image", "audio"
-          attachment = MCP::Attachment.new(content["content"], content["mime_type"])
+          attachment = MCP::Attachment.new(content["data"], content["mimeType"])
           MCP::Content.new(text: nil, attachments: [attachment])
         when "resource"
-          resource = Resource.new(mcp_client, content["resource"])
+          resource_data = {
+            "name" => name,
+            "description" => description,
+            "uri" => content.dig("resource", "uri"),
+            "content" => content["resource"]
+          }
+
+          resource = Resource.new(mcp_client, resource_data)
           resource.to_content
         end
       end

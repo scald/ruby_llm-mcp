@@ -1,0 +1,195 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you fetch the website http://www.google.com and see if the site say what they
+        do?"}]}],"temperature":0.7,"stream":false,"max_tokens":8192,"tools":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 22 Jun 2025 12:57:07 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '40000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '40000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-06-22T12:57:06Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-06-22T12:57:08Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-06-22T12:57:06Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '48000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '48000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-06-22T12:57:06Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      Via:
+      - 1.1 google
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":"msg_01CpnRhtp6NT9EBfiNnv1e1v","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"Certainly!
+        I''ll use the fetch_site function to retrieve the content from http://www.google.com
+        and then analyze it to see if the site explicitly states what they do. Let
+        me fetch the content for you."},{"type":"tool_use","id":"toolu_01S2iUseMxtBmaheHRmZBTU3","name":"fetch_site","input":{"website":"http://www.google.com"}}],"stop_reason":"tool_use","stop_sequence":null,"usage":{"input_tokens":454,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":106,"service_tier":"standard"}}'
+  recorded_at: Sun, 22 Jun 2025 12:57:07 GMT
+- request:
+    method: post
+    uri: https://api.anthropic.com/v1/messages
+    body:
+      encoding: UTF-8
+      string: '{"model":"claude-3-5-sonnet-20240620","messages":[{"role":"user","content":[{"type":"text","text":"Can
+        you fetch the website http://www.google.com and see if the site say what they
+        do?"}]},{"role":"assistant","content":[{"type":"text","text":"Certainly! I''ll
+        use the fetch_site function to retrieve the content from http://www.google.com
+        and then analyze it to see if the site explicitly states what they do. Let
+        me fetch the content for you."},{"type":"tool_use","id":"toolu_01S2iUseMxtBmaheHRmZBTU3","name":"fetch_site","input":{"website":"http://www.google.com"}}]},{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_01S2iUseMxtBmaheHRmZBTU3","content":"Website
+        content from http://www.google.com:\n\nGoogle Search Images Maps Play YouTube
+        News Gmail Drive More Calendar Translate Books Shopping Blogger Finance Photos
+        Docs Even more &raquo; Account Options Sign in Search settings Web History
+        &nbsp; Advanced search Google offered in: Français Advertising Business Solutions
+        About Google Google.ca &copy; 2025 - Privacy - Terms"}]}],"temperature":0.7,"stream":false,"max_tokens":8192,"tools":[{"name":"fetch_site","description":"Fetches
+        website content and returns it as text","input_schema":{"type":"object","properties":{"website":{"anyOf":[{"type":"string"},{"type":"object","properties":{"url":{"type":"string"},"headers":{"type":"array","items":{"type":"object","properties":{"name":{"type":"string"},"value":{"type":"string"}}}}},"required":[]}]}},"required":["website"]}}]}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Api-Key:
+      - "<ANTHROPIC_API_KEY>"
+      Anthropic-Version:
+      - '2023-06-01'
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Date:
+      - Sun, 22 Jun 2025 12:57:14 GMT
+      Content-Type:
+      - application/json
+      Transfer-Encoding:
+      - chunked
+      Connection:
+      - keep-alive
+      Anthropic-Ratelimit-Input-Tokens-Limit:
+      - '40000'
+      Anthropic-Ratelimit-Input-Tokens-Remaining:
+      - '40000'
+      Anthropic-Ratelimit-Input-Tokens-Reset:
+      - '2025-06-22T12:57:08Z'
+      Anthropic-Ratelimit-Output-Tokens-Limit:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Remaining:
+      - '8000'
+      Anthropic-Ratelimit-Output-Tokens-Reset:
+      - '2025-06-22T12:57:16Z'
+      Anthropic-Ratelimit-Requests-Limit:
+      - '50'
+      Anthropic-Ratelimit-Requests-Remaining:
+      - '49'
+      Anthropic-Ratelimit-Requests-Reset:
+      - '2025-06-22T12:57:09Z'
+      Anthropic-Ratelimit-Tokens-Limit:
+      - '48000'
+      Anthropic-Ratelimit-Tokens-Remaining:
+      - '48000'
+      Anthropic-Ratelimit-Tokens-Reset:
+      - '2025-06-22T12:57:08Z'
+      Request-Id:
+      - "<REQUEST_ID>"
+      Strict-Transport-Security:
+      - max-age=31536000; includeSubDomains; preload
+      Anthropic-Organization-Id:
+      - e1031ea3-bbf0-4676-9f23-42dec1e708ae
+      Via:
+      - 1.1 google
+      Cf-Cache-Status:
+      - DYNAMIC
+      X-Robots-Tag:
+      - none
+      Server:
+      - cloudflare
+      Cf-Ray:
+      - "<CF_RAY>"
+    body:
+      encoding: ASCII-8BIT
+      string: '{"id":"msg_012wFmxxpiT6oRZeNUutRNys","type":"message","role":"assistant","model":"claude-3-5-sonnet-20240620","content":[{"type":"text","text":"After
+        analyzing the content fetched from http://www.google.com, I can provide you
+        with the following information:\n\nThe website doesn''t explicitly state what
+        Google does in a comprehensive manner on its homepage. However, we can infer
+        some information about Google''s services from the content:\n\n1. Google''s
+        primary function appears to be a search engine, as evidenced by the prominent
+        search bar and \"Search settings\" option.\n\n2. The site lists various other
+        services and products offered by Google, including:\n   - Images\n   - Maps\n   -
+        Play (likely referring to Google Play store)\n   - YouTube\n   - News\n   -
+        Gmail\n   - Drive\n   - Calendar\n   - Translate\n   - Books\n   - Shopping\n   -
+        Blogger\n   - Finance\n   - Photos\n   - Docs\n\n3. The homepage also mentions
+        \"Advanced search\" and \"Web History,\" further emphasizing its role as a
+        search engine.\n\n4. There are links to \"Advertising\" and \"Business Solutions,\"
+        suggesting that Google offers services for businesses and advertisers.\n\n5.
+        The presence of \"Account Options\" and \"Sign in\" indicates that Google
+        provides personalized services to users with accounts.\n\nWhile the homepage
+        doesn''t provide a detailed description of what Google does, it''s clear that
+        Google is primarily a search engine that also offers a wide range of other
+        internet-based services and products. The homepage is designed to be a simple
+        entry point to these various services rather than a detailed explanation of
+        the company''s functions.\n\nIf you''d like more specific information about
+        what Google does, we might need to look at their \"About\" page or other sections
+        of their website. Would you like me to fetch any other pages for more detailed
+        information?"}],"stop_reason":"end_turn","stop_sequence":null,"usage":{"input_tokens":650,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":369,"service_tier":"standard"}}'
+  recorded_at: Sun, 22 Jun 2025 12:57:14 GMT
+recorded_with: VCR 6.3.1

@@ -12,13 +12,16 @@ This project is a Ruby client for the [Model Context Protocol (MCP)](https://mod
 - 🛠️ **Tool Integration**: Automatically converts MCP tools into RubyLLM-compatible tools
 - 📄 **Resource Management**: Access and include MCP resources (files, data) and resource templates in conversations
 - 🎯 **Prompt Integration**: Use predefined MCP prompts with arguments for consistent interactions
-- 🔄 **Real-time Communication**: Efficient bidirectional communication with MCP servers
 - 🎨 **Enhanced Chat Interface**: Extended RubyLLM chat methods for seamless MCP integration
 - 📚 **Simple API**: Easy-to-use interface that integrates seamlessly with RubyLLM
 
 ## Installation
 
-Add this line to your application's Gemfile:
+```bash
+bundle add ruby_llm-mcp
+```
+
+or add this line to your application's Gemfile:
 
 ```ruby
 gem 'ruby_llm-mcp'
@@ -152,12 +155,12 @@ MCP servers can provide access to resources - structured data that can be includ
 # Get available resources from the MCP server
 resources = client.resources
 puts "Available resources:"
-resources.each do |name, resource|
-  puts "- #{name}: #{resource.description}"
+resources.each do |resource|
+  puts "- #{resource.name}: #{resource.description}"
 end
 
-# Access a specific resource
-file_resource = resources["project_readme"]
+# Access a specific resource by name
+file_resource = client.resource("project_readme")
 content = file_resource.content
 puts "Resource content: #{content}"
 
@@ -179,11 +182,11 @@ Resource templates are parameterized resources that can be dynamically configure
 ```ruby
 # Get available resource templates
 templates = client.resource_templates
-log_template = templates["application_logs"]
+log_template = client.resource_template("application_logs")
 
 # Use a template with parameters
 chat = RubyLLM.chat(model: "gpt-4")
-chat.with_resource(log_template, arguments: {
+chat.with_resource_template(log_template, arguments: {
   date: "2024-01-15",
   level: "error"
 })
@@ -192,7 +195,7 @@ response = chat.ask("What errors occurred on this date?")
 puts response
 
 # You can also get templated content directly
-content = log_template.content(arguments: {
+content = log_template.to_content(arguments: {
   date: "2024-01-15",
   level: "error"
 })
@@ -204,12 +207,12 @@ puts content
 For resource templates, you can get suggested values for arguments:
 
 ```ruby
-template = client.resource_templates["user_profile"]
+template = client.resource_template("user_profile")
 
 # Search for possible values for a specific argument
-suggestions = template.arguments_search("username", "john")
+suggestions = template.complete("username", "john")
 puts "Suggested usernames:"
-suggestions.arg_values.each do |value|
+suggestions.values.each do |value|
   puts "- #{value}"
 end
 puts "Total matches: #{suggestions.total}"
@@ -224,15 +227,15 @@ MCP servers can provide predefined prompts that can be used in conversations:
 # Get available prompts from the MCP server
 prompts = client.prompts
 puts "Available prompts:"
-prompts.each do |name, prompt|
-  puts "- #{name}: #{prompt.description}"
+prompts.each do |prompt|
+  puts "- #{prompt.name}: #{prompt.description}"
   prompt.arguments.each do |arg|
     puts "  - #{arg.name}: #{arg.description} (required: #{arg.required})"
   end
 end
 
 # Use a prompt in a conversation
-greeting_prompt = prompts["daily_greeting"]
+greeting_prompt = client.prompt("daily_greeting")
 chat = RubyLLM.chat(model: "gpt-4")
 
 # Method 1: Ask prompt directly
@@ -261,21 +264,103 @@ chat = RubyLLM.chat(model: "gpt-4")
 chat.with_tools(*client.tools)
 
 # Add resources for context
-chat.with_resource(client.resources["project_structure"])
+chat.with_resource(client.resource("project_structure"))
 chat.with_resource(
-  client.resource_templates["recent_commits"],
+  client.resource_template("recent_commits"),
   arguments: { days: 7 }
 )
 
 # Add prompts for guidance
 chat.with_prompt(
-  client.prompts["code_review_checklist"],
+  client.prompt("code_review_checklist"),
   arguments: { focus: "security" }
 )
 
 # Now ask for analysis
 response = chat.ask("Please review the recent commits using the checklist and suggest improvements")
 puts response
+```
+
+## Argument Completion
+
+Some MCP servers support argument completion for prompts and resource templates:
+
+```ruby
+# For prompts
+prompt = client.prompt("user_search")
+suggestions = prompt.complete("username", "jo")
+puts "Suggestions: #{suggestions.values}" # ["john", "joanna", "joseph"]
+
+# For resource templates
+template = client.resource_template("user_logs")
+suggestions = template.complete("user_id", "123")
+puts "Total matches: #{suggestions.total}"
+puts "Has more results: #{suggestions.has_more}"
+```
+
+## Additional Chat Methods
+
+The gem extends RubyLLM's chat interface with convenient methods for MCP integration:
+
+```ruby
+chat = RubyLLM.chat(model: "gpt-4")
+
+# Add a single resource
+chat.with_resource(resource)
+
+# Add multiple resources
+chat.with_resources(resource1, resource2, resource3)
+
+# Add a resource template with arguments
+chat.with_resource_template(resource_template, arguments: { key: "value" })
+
+# Add a prompt with arguments
+chat.with_prompt(prompt, arguments: { name: "Alice" })
+
+# Ask using a prompt directly
+response = chat.ask_prompt(prompt, arguments: { name: "Alice" })
+```
+
+## Client Lifecycle Management
+
+You can manage the MCP client connection lifecycle:
+
+```ruby
+client = RubyLLM::MCP.client(name: "my-server", transport_type: :stdio, start: false, config: {...})
+
+# Manually start the connection
+client.start
+
+# Check if connection is alive
+puts client.alive?
+
+# Restart the connection
+client.restart!
+
+# Stop the connection
+client.stop
+```
+
+## Refreshing Cached Data
+
+The client caches tools, resources, prompts, and resource templates list calls are cached to reduce round trips back to the MCP server. You can refresh this cache:
+
+```ruby
+# Refresh all cached tools
+tools = client.tools(refresh: true)
+
+# Refresh a specific tool
+tool = client.tool("search_files", refresh: true)
+
+# Same pattern works for resources, prompts, and resource templates
+resources = client.resources(refresh: true)
+prompts = client.prompts(refresh: true)
+templates = client.resource_templates(refresh: true)
+
+# Or refresh specific items
+resource = client.resource("project_readme", refresh: true)
+prompt = client.prompt("daily_greeting", refresh: true)
+template = client.resource_template("user_logs", refresh: true)
 ```
 
 ## Transport Types
@@ -289,7 +374,8 @@ client = RubyLLM::MCP.client(
   name: "web-mcp-server",
   transport_type: :sse,
   config: {
-    url: "https://your-mcp-server.com/mcp/sse"
+    url: "https://your-mcp-server.com/mcp/sse",
+    headers: { "Authorization" => "Bearer your-token" }
   }
 )
 ```
@@ -329,9 +415,10 @@ client = RubyLLM::MCP.client(
 
 - `name`: A unique identifier for your MCP client
 - `transport_type`: Either `:sse`, `:streamable`, or `:stdio`
+- `start`: Whether to automatically start the connection (default: true)
 - `request_timeout`: Timeout for requests in milliseconds (default: 8000)
 - `config`: Transport-specific configuration
-  - For SSE: `{ url: "http://..." }`
+  - For SSE: `{ url: "http://...", headers: {...} }`
   - For Streamable: `{ url: "http://...", headers: {...} }`
   - For stdio: `{ command: "...", args: [...], env: {...} }`
 
@@ -339,13 +426,16 @@ client = RubyLLM::MCP.client(
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`. Run `bundle exec rake` to test specs and run linters. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Examples
 
 Check out the `examples/` directory for more detailed usage examples:
 
-- `examples/test_local_mcp.rb` - Complete example with SSE transport
+- `examples/tools/local_mcp.rb` - Complete example with stdio transport
+- `examples/tools/sse_mcp_with_gpt.rb` - Example using SSE transport with GPT
+- `examples/resources/list_resources.rb` - Example of listing and using resources
+- `examples/prompts/streamable_prompt_call.rb` - Example of using prompts with streamable transport
 
 ## Contributing
 

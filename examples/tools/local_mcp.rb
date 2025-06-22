@@ -18,7 +18,7 @@ client = RubyLLM::MCP.client(
   name: "filesystem",
   transport_type: :stdio,
   config: {
-    command: "npx",
+    command: "bunx",
     args: [
       "@modelcontextprotocol/server-filesystem",
       File.expand_path("..", __dir__) # Allow access to the current directory
@@ -31,13 +31,14 @@ puts "Transport type: #{File.expand_path('..', __dir__)}"
 puts "Connected to filesystem MCP server"
 puts "Available tools:"
 tools = client.tools
-puts tools.map { |tool| "  - #{tool.name}: #{tool.description}" }.join("\n")
+puts tools.map(&:name).join("\n")
 puts "-" * 50
 
+tool = client.tool("firecrawl_crawl")
 chat = RubyLLM.chat(model: "gpt-4.1")
-chat.with_tools(*client.tools)
+chat.with_tool(tool)
 
-message = "Can you list the files in the current directory and tell me what's in the README file if it exists?"
+message = "Can you crawl the website http://www.fullscript.com and tell me what fullscript does?"
 puts "Asking: #{message}"
 puts "-" * 50
 

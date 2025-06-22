@@ -16,4 +16,8 @@ group :development do
   gem "rubocop", ">= 1.76"
   gem "rubocop-rake", ">= 0.7"
   gem "rubocop-rspec", ">= 3.6"
+  gem "simplecov"
+  gem "vcr"
 end
+
+gem "webmock", "~> 3.25"

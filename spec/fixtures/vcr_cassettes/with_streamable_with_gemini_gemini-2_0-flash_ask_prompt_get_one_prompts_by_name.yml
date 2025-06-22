@@ -1,0 +1,88 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day? Make sure to include the word ''poem'' in your
+        response."}]}],"generationConfig":{"temperature":0.7}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Sun, 22 Jun 2025 13:06:44 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2317
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The sun, a painter, splashed the eastern sky,\nWith hues of rose and apricot so high.\nA gentle breeze, a whisper through the trees,\nBrought forth the scent of earth and morning ease.\n\nThe birds awoke and sang their joyful tune,\nA chorus rising 'neath the nascent moon,\nNow faded pale, a memory of night,\nReplaced by day, a canvas pure and bright.\n\nThe world unfolds, a tapestry of grace,\nIn every dewdrop, mirrored in its place\nThe blue above, a perfect, tiny sphere,\nReflecting hope and banishing all fear.\n\nThe bustling streets begin to hum and thrum,\nWith lives entwined, where joys and sorrows come.\nEach face a story, etched with time and care,\nA silent novel written in the air.\n\nAnd I, a witness to this vibrant scene,\nAttempt to capture what it truly means.\nTo feel the pulse, the rhythm, and the light,\nAnd weave a thread within this fleeting sight.\n\nThis day, a gift, unwrapped with open eyes,\nA precious moment 'neath cerulean skies.\nAnd if I fail to truly make it bloom,\nAt least I tried to write this simple **poem**.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.5693817138671875
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 25,
+            "candidatesTokenCount": 260,
+            "totalTokenCount": 285,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 25
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 260
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "4v9XaPKUHpTehMIPyoOx2As"
+        }
+  recorded_at: Sun, 22 Jun 2025 13:06:44 GMT
+recorded_with: VCR 6.3.1
