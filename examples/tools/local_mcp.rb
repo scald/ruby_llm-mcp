@@ -14,40 +14,15 @@ end
 RubyLLM::MCP.support_complex_parameters!
 
 # Test with filesystem MCP server using stdio transport
-# client = RubyLLM::MCP.client(
-#   name: "filesystem",
-#   transport_type: :stdio,
-#   config: {
-#     command: "bunx",
-#     args: [
-#       "@modelcontextprotocol/server-filesystem",
-#       File.expand_path("..", __dir__) # Allow access to the current directory
-#     ]
-#   }
-# )
-
-# Test with filesystem MCP server using stdio transport
-# client = RubyLLM::MCP.client(
-#   name: "filesystem",
-#   transport_type: :stdio,
-#   config: {
-#     command: "bun",
-#     args: [
-#       "./spec/fixtures/typescript-mcp/index.ts",
-#       "--stdio"
-#     ]
-#   }
-# )
-
 client = RubyLLM::MCP.client(
-  name: "firecrawl-mcp",
+  name: "filesystem",
   transport_type: :stdio,
   config: {
-    command: "npx",
-    args: ["-y", "firecrawl-mcp"],
-    env: {
-      "FIRECRAWL_API_KEY" => ENV.fetch("FIRECRAWL_API_KEY", nil)
-    }
+    command: "bunx",
+    args: [
+      "@modelcontextprotocol/server-filesystem",
+      File.expand_path("..", __dir__) # Allow access to the current directory
+    ]
   }
 )
 
