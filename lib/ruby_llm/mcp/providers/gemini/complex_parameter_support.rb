@@ -41,7 +41,7 @@ module RubyLLM
                            }
                          when :union
                            {
-                             param.union_type => param.properties.map { |properties| clean_parameters(properties) }
+                             param.union_type => param.properties.map { |properties| build_properties(properties) }
                            }
                          else
                            {

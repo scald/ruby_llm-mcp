@@ -5,8 +5,11 @@ http_interactions:
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
-      string: '{"contents":[{"role":"user","parts":[{"text":"Hello, how are you? Can
-        you also say hello back?"}]}],"generationConfig":{"temperature":0.7}}'
+      string: '{"contents":[{"role":"user","parts":[{"text":"my.md: A markdown file\n\n#
+        My Markdown File\n\nThis is a markdown file that I want to be able to use
+        as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n##
+        Section 2\n\nThis is another section in my markdown file\n"}]},{"role":"user","parts":[{"text":"What
+        does the markdown file say?"}]}],"generationConfig":{"temperature":0.7}}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -30,7 +33,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:07:18 GMT
+      - Sun, 22 Jun 2025 13:01:49 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +43,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=431
+      - gfet4t7; dur=1137
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -54,34 +57,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Hello! I'm doing well, thank you for asking. How are you?\n"
+                    "text": "The markdown file `my.md` contains the following text:\n\n```markdown\n# My Markdown File\n\nThis is a markdown file that I want to be able to use as a resource\n\n## Section 1\n\nThis is a section in my markdown file\n\n## Section 2\n\nThis is another section in my markdown file\n```\n\nThis will render as a document with a main heading \"My Markdown File\", a paragraph describing its purpose, and then two sections titled \"Section 1\" and \"Section 2\" each with a short paragraph describing their contents.\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.033926132652494639
+              "avgLogprobs": -0.16109976275213833
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 13,
-            "candidatesTokenCount": 18,
-            "totalTokenCount": 31,
+            "promptTokenCount": 65,
+            "candidatesTokenCount": 116,
+            "totalTokenCount": 181,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 13
+                "tokenCount": 65
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 18
+                "tokenCount": 116
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BgBYaIfdHcy12cAP0YDw0Qc"
+          "responseId": "vP5XaKDuBpTehMIPyoOx2As"
         }
-  recorded_at: Sun, 22 Jun 2025 13:07:18 GMT
+  recorded_at: Sun, 22 Jun 2025 13:01:49 GMT
 recorded_with: VCR 6.3.1

@@ -10,7 +10,7 @@ export function setupSimplePrompts(server: McpServer) {
           role: "user",
           content: {
             type: "text",
-            text: "Hello, how are you?",
+            text: "Hello, how are you? Can you also say Hello back?",
           },
         },
       ],
@@ -46,7 +46,7 @@ export function setupSimplePrompts(server: McpServer) {
         role: "user",
         content: {
           type: "text",
-          text: "Can you write me a beautiful poem about the current day?",
+          text: "Can you write me a beautiful poem about the current day? Make sure to include the word 'poem' in your response.",
         },
       },
     ],

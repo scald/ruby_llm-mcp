@@ -5,8 +5,10 @@ http_interactions:
     uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
     body:
       encoding: UTF-8
-      string: '{"contents":[{"role":"user","parts":[{"text":"Hello, how are you? Can
-        you also say hello back?"}]}],"generationConfig":{"temperature":0.7}}'
+      string: '{"contents":[{"role":"user","parts":[{"text":"test.txt: A text file\n\nHello,
+        this is a test file!\nThis content will be served by the MCP resource.\nYou
+        can modify this file and it will be cached for 5 minutes.\n"}]},{"role":"user","parts":[{"text":"What
+        does the test file contain?"}]}],"generationConfig":{"temperature":0.7}}'
     headers:
       User-Agent:
       - Faraday v2.13.1
@@ -30,7 +32,7 @@ http_interactions:
       - Referer
       - X-Origin
       Date:
-      - Sun, 22 Jun 2025 13:07:18 GMT
+      - Sun, 22 Jun 2025 13:01:47 GMT
       Server:
       - scaffolding on HTTPServer2
       X-Xss-Protection:
@@ -40,7 +42,7 @@ http_interactions:
       X-Content-Type-Options:
       - nosniff
       Server-Timing:
-      - gfet4t7; dur=431
+      - gfet4t7; dur=691
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
       Transfer-Encoding:
@@ -54,34 +56,34 @@ http_interactions:
               "content": {
                 "parts": [
                   {
-                    "text": "Hello! I'm doing well, thank you for asking. How are you?\n"
+                    "text": "The test file contains the following text:\n\n```\nHello, this is a test file!\nThis content will be served by the MCP resource.\nYou can modify this file and it will be cached for 5 minutes.\n```\n"
                   }
                 ],
                 "role": "model"
               },
               "finishReason": "STOP",
-              "avgLogprobs": -0.033926132652494639
+              "avgLogprobs": -0.044312545231410434
             }
           ],
           "usageMetadata": {
-            "promptTokenCount": 13,
-            "candidatesTokenCount": 18,
-            "totalTokenCount": 31,
+            "promptTokenCount": 51,
+            "candidatesTokenCount": 49,
+            "totalTokenCount": 100,
             "promptTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 13
+                "tokenCount": 51
               }
             ],
             "candidatesTokensDetails": [
               {
                 "modality": "TEXT",
-                "tokenCount": 18
+                "tokenCount": 49
               }
             ]
           },
           "modelVersion": "gemini-2.0-flash",
-          "responseId": "BgBYaIfdHcy12cAP0YDw0Qc"
+          "responseId": "u_5XaOnlGLmFmNAPxPbFyQY"
         }
-  recorded_at: Sun, 22 Jun 2025 13:07:18 GMT
+  recorded_at: Sun, 22 Jun 2025 13:01:47 GMT
 recorded_with: VCR 6.3.1

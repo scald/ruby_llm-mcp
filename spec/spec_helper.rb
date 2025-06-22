@@ -113,11 +113,8 @@ CLIENT_OPTIONS = [
 
 COMPLEX_FUNCTION_MODELS = [
   { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
-  # { provider: :bedrock, model: "us.anthropic.claude-3-5-haiku-20241022-v1:0" },
-  # { provider: :gemini, model: "gemini-2.0-flash" },
-  # { provider: :deepseek, model: "deepseek-chat" },
+  { provider: :gemini, model: "gemini-2.0-flash" },
   { provider: :openai, model: "gpt-4.1" }
-  # { provider: :openrouter, model: "anthropic/claude-3.5-sonnet" }
 ].freeze
 
 RSpec.configure do |config|

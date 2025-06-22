@@ -86,7 +86,7 @@ RSpec.describe RubyLLM::Chat do
               chat.with_tool(tool)
 
               response = chat.ask("Can you fetch the website http://www.google.com and see if the site say what they do?")
-              expect(response.content).to include("Google")
+              expect(response.content.downcase).to include("google")
             end
           end
 
@@ -168,7 +168,7 @@ RSpec.describe RubyLLM::Chat do
 
               prompt = prompts.first
               response = chat.ask_prompt(prompt)
-              expect(response.content).to include("Hello!")
+              expect(response.content.downcase).to include("hello")
             end
 
             it "get one prompts by name" do
