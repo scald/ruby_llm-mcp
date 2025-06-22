@@ -38,7 +38,7 @@ module RubyLLM
                            {
                              type: param.type,
                              description: param.description
-                           }
+                           }.compact
                          end
 
             properties.compact

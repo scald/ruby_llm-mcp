@@ -1,0 +1,87 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent
+    body:
+      encoding: UTF-8
+      string: '{"contents":[{"role":"user","parts":[{"text":"Can you write me a beautiful
+        poem about the current day?"}]}],"generationConfig":{"temperature":0.7}}'
+    headers:
+      User-Agent:
+      - Faraday v2.13.1
+      X-Goog-Api-Key:
+      - "<GEMINI_API_KEY>"
+      Content-Type:
+      - application/json
+      Accept-Encoding:
+      - gzip;q=1.0,deflate;q=0.6,identity;q=0.3
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - application/json; charset=UTF-8
+      Vary:
+      - Origin
+      - Referer
+      - X-Origin
+      Date:
+      - Sat, 21 Jun 2025 16:45:07 GMT
+      Server:
+      - scaffolding on HTTPServer2
+      X-Xss-Protection:
+      - '0'
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Content-Type-Options:
+      - nosniff
+      Server-Timing:
+      - gfet4t7; dur=2422
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Transfer-Encoding:
+      - chunked
+    body:
+      encoding: ASCII-8BIT
+      string: |
+        {
+          "candidates": [
+            {
+              "content": {
+                "parts": [
+                  {
+                    "text": "The dawn unfurls, a blush upon the gray,\nA gentle promise whispered to the day.\nThe world awakens, stretches, takes a breath,\nAnd shakes the slumber from the limbs of death.\n\nThe sun ascends, a painter in the sky,\nWith strokes of gold, where indigo did lie.\nA robin sings a melody so clear,\nChasing away the lingering drop of tear.\n\nThe wind, a dancer, twirls among the trees,\nA rustling murmur carried on the breeze.\nIt whispers secrets to the waiting flowers,\nAnd gathers scents from sun-drenched summer hours.\n\nThe bustling city hums a vibrant tune,\nA symphony of labor, late and soon.\nFrom coffee steam to clanging of the train,\nA thousand stories weave a vibrant chain.\n\nBut quiet corners offer solace too,\nWhere dappled sunlight filters softly through.\nA park bench waits, a book within your hand,\nA moment stolen in this busy land.\n\nThe afternoon, a golden, languid ease,\nA gentle pause beneath the rustling trees.\nThe air is thick with honey, ripe and sweet,\nA lullaby that calms the weary feet.\n\nAnd as the evening paints the western sky,\nWith hues of crimson, where the day must die,\nA sense of peace descends, a quiet grace,\nA moment held within this transient space.\n\nSo let us cherish, every precious hour,\nThe sunlit meadows and the gentle shower.\nFor this day's beauty, fleeting as it seems,\nIs woven in the tapestry of dreams.\n"
+                  }
+                ],
+                "role": "model"
+              },
+              "finishReason": "STOP",
+              "avgLogprobs": -0.50730877500591853
+            }
+          ],
+          "usageMetadata": {
+            "promptTokenCount": 12,
+            "candidatesTokenCount": 330,
+            "totalTokenCount": 342,
+            "promptTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 12
+              }
+            ],
+            "candidatesTokensDetails": [
+              {
+                "modality": "TEXT",
+                "tokenCount": 330
+              }
+            ]
+          },
+          "modelVersion": "gemini-2.0-flash",
+          "responseId": "keFWaOPlK4WT1dkP_cOosQU"
+        }
+  recorded_at: Sat, 21 Jun 2025 16:45:07 GMT
+recorded_with: VCR 6.3.1

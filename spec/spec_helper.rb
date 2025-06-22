@@ -19,6 +19,7 @@ SimpleCov.start do
 end
 
 require "bundler/setup"
+require "ruby_llm"
 require "ruby_llm/mcp"
 
 # VCR Configuration
@@ -111,7 +112,7 @@ CLIENT_OPTIONS = [
 ].freeze
 
 COMPLEX_FUNCTION_MODELS = [
-  # { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
+  { provider: :anthropic, model: "claude-3-5-sonnet-20240620" },
   # { provider: :bedrock, model: "us.anthropic.claude-3-5-haiku-20241022-v1:0" },
   # { provider: :gemini, model: "gemini-2.0-flash" },
   # { provider: :deepseek, model: "deepseek-chat" },

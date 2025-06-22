@@ -10,7 +10,7 @@ module RubyLLM
         @mcp_client = mcp_client
 
         @name = tool_response["name"]
-        @description = tool_response["description"]
+        @description = tool_response["description"].to_s
         @parameters = create_parameters(tool_response["inputSchema"])
       end
 

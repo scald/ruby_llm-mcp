@@ -39,13 +39,13 @@ module RubyLLM
               }
             when :union
               {
-                param.union_type => param.properties.map { |properties| clean_parameters(properties) }
+                param.union_type => param.properties.map { |property| build_properties(property) }
               }
             else
               {
                 type: param.type,
                 description: param.description
-              }
+              }.compact
             end
           end
         end
@@ -54,4 +54,12 @@ module RubyLLM
   end
 end
 
-RubyLLM::Providers::Anthropic.extend(RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport)
+module RubyLLM::Providers::Anthropic::Tools
+  def self.clean_parameters(parameters)
+    RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.clean_parameters(parameters)
+  end
+
+  def self.required_parameters(parameters)
+    RubyLLM::MCP::Providers::Anthropic::ComplexParameterSupport.required_parameters(parameters)
+  end
+end

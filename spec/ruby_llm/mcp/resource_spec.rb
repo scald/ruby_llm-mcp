@@ -93,11 +93,11 @@ RSpec.describe RubyLLM::MCP::Resource do
 
       describe "binary_content_resources" do
         it "can retrieve image resource content" do
-          image_resource = client.resource("dog.jpeg")
+          image_resource = client.resource("dog.png")
 
           expect(image_resource).to be_a(RubyLLM::MCP::Resource)
-          expect(image_resource.name).to eq("dog.jpeg")
-          expect(image_resource.mime_type).to eq("image/jpeg")
+          expect(image_resource.name).to eq("dog.png")
+          expect(image_resource.mime_type).to eq("image/png")
 
           content = image_resource.content
           expect(content).to be_a(String)
@@ -117,14 +117,14 @@ RSpec.describe RubyLLM::MCP::Resource do
         end
 
         it "converts image resource to MCP::Content with attachment" do
-          image_resource = client.resource("dog.jpeg")
+          image_resource = client.resource("dog.png")
           content = image_resource.to_content
 
           expect(content).to be_a(RubyLLM::MCP::Content)
           expect(content.attachments.first).to be_a(RubyLLM::MCP::Attachment)
-          expect(content.attachments.first.mime_type).to eq("image/jpeg")
+          expect(content.attachments.first.mime_type).to eq("image/png")
           expect(content.attachments.first.content).not_to be_nil
-          expect(content.text).to include("dog.jpeg")
+          expect(content.text).to include("dog.png")
         end
 
         it "converts audio resource to MCP::Content with attachment" do

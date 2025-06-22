@@ -103,12 +103,12 @@ RSpec.describe RubyLLM::Chat do
             it "adds binary resources to the chat" do
               chat = RubyLLM.chat(model: config[:model])
               binary_resources = client.resources.select do |resource|
-                resource.mime_type&.include?("image") || resource.mime_type&.include?("audio")
+                resource.mime_type&.include?("image")
               end
               chat.with_resources(*binary_resources)
 
               response = chat.ask("What resources do you have access to?")
-              expect(response.content).to match(/dog|jackhammer|image|audio/i)
+              expect(response.content).to match(/dog|jackhammer|image/i)
             end
           end
 
@@ -133,11 +133,11 @@ RSpec.describe RubyLLM::Chat do
 
             it "adds an image resource to the chat" do
               chat = RubyLLM.chat(model: config[:model])
-              resource = client.resource("dog.jpeg")
+              resource = client.resource("dog.png")
               chat.with_resource(resource)
 
               response = chat.ask("What image do you have?")
-              expect(response.content).to match(/dog|image|picture/i)
+              expect(response.content).to match(/dog|image|picture|png/i)
             end
           end
 

@@ -3,17 +3,17 @@ import { readFile } from "node:fs/promises";
 
 export function setupMediaResources(server: McpServer) {
   server.resource(
-    "dog.jpeg",
-    "file://dog.jpeg/",
+    "dog.png",
+    "file://dog.png/",
     {
-      name: "dog.jpeg",
+      name: "dog.png",
       description: "A picture of a dog",
-      mimeType: "image/jpeg",
+      mimeType: "image/png",
     },
     async (uri) => {
       try {
         const imageBuffer = await readFile(
-          "./spec/fixtures/typescript-mcp/resources/dog.jpeg"
+          "./spec/fixtures/typescript-mcp/resources/dog.png"
         );
         const base64Image = imageBuffer.toString("base64");
 
@@ -22,7 +22,7 @@ export function setupMediaResources(server: McpServer) {
             {
               uri: uri.href,
               blob: base64Image,
-              mimeType: "image/jpeg",
+              mimeType: "image/png",
             },
           ],
         };
