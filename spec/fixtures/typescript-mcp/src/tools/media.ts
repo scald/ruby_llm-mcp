@@ -43,13 +43,13 @@ export function setupMediaTools(server: McpServer) {
 
   server.tool(
     "get_dog_image",
-    "Returns the dog image as a base64-encoded JPEG",
+    "Returns the dog image as a base64-encoded PNG",
     {},
     async () => {
       try {
         // Read the dog image file from resources
         const imageBuffer = await readFile(
-          "./spec/fixtures/typescript-mcp/resources/dog.jpeg"
+          "./spec/fixtures/typescript-mcp/resources/dog.png"
         );
 
         // Convert to base64
@@ -60,7 +60,7 @@ export function setupMediaTools(server: McpServer) {
             {
               type: "image",
               data: base64Image,
-              mimeType: "image/jpeg",
+              mimeType: "image/png",
             },
           ],
         };

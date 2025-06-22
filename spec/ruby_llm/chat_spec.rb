@@ -85,7 +85,8 @@ RSpec.describe RubyLLM::Chat do
               tool = client.tool("fetch_site")
               chat.with_tool(tool)
 
-              response = chat.ask("Can you fetch the website http://www.google.com and see if the site say what they do?")
+              prompt = "Can you fetch the website http://www.google.com and see if the site say what they do?"
+              response = chat.ask(prompt)
               expect(response.content.downcase).to include("google")
             end
           end

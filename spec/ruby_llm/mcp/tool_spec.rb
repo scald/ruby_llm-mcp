@@ -79,7 +79,7 @@ RSpec.describe RubyLLM::MCP::Tool do
 
           expect(result).to be_a(RubyLLM::MCP::Content)
           expect(result.attachments.first).to be_a(RubyLLM::MCP::Attachment)
-          expect(result.attachments.first.mime_type).to eq("image/jpeg")
+          expect(result.attachments.first.mime_type).to eq("image/png")
           expect(result.attachments.first.content).not_to be_nil
         end
 

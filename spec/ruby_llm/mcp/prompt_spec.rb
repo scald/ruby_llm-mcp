@@ -24,7 +24,7 @@ RSpec.describe RubyLLM::MCP::Prompt do
           expect(messages).to be_a(Array)
           expect(messages.first).to be_a(RubyLLM::Message)
           expect(messages.first.role).to eq(:user)
-          expect(messages.first.content).to eq("Hello, how are you?")
+          expect(messages.first.content).to eq("Hello, how are you? Can you also say Hello back?")
         end
 
         it "returns multiple messages" do # rubocop:disable RSpec/MultipleExpectations,RSpec/ExampleLength
