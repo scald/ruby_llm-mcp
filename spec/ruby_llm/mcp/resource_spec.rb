@@ -66,7 +66,6 @@ RSpec.describe RubyLLM::MCP::Resource do
 
           expect(resource.name).to eq("test.txt")
           expect(resource.uri).to eq("file://test.txt/")
-          expect(resource.mcp_client).to eq(client)
         end
       end
 

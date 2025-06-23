@@ -3,10 +3,10 @@
 module RubyLLM
   module MCP
     class ResourceTemplate
-      attr_reader :uri, :name, :description, :mime_type, :mcp_client, :template
+      attr_reader :uri, :name, :description, :mime_type, :coordinator, :template
 
-      def initialize(mcp_client, resource)
-        @mcp_client = mcp_client
+      def initialize(coordinator, resource)
+        @coordinator = coordinator
         @uri = resource["uriTemplate"]
         @name = resource["name"]
         @description = resource["description"]
@@ -18,7 +18,7 @@ module RubyLLM
         response = read_response(uri)
         content_response = response.dig("result", "contents", 0)
 
-        Resource.new(mcp_client, {
+        Resource.new(coordinator, {
                        "uri" => uri,
                        "name" => "#{@name} (#{uri})",
                        "description" => @description,
@@ -32,8 +32,8 @@ module RubyLLM
       end
 
       def complete(argument, value)
-        if @mcp_client.capabilities.completion?
-          response = @mcp_client.completion_resource(uri: @uri, argument: argument, value: value)
+        if @coordinator.capabilities.completion?
+          response = @coordinator.completion_resource(uri: @uri, argument: argument, value: value)
           response = response.dig("result", "completion")
 
           Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
@@ -58,7 +58,7 @@ module RubyLLM
         when "http", "https"
           fetch_uri_content(uri)
         else # file:// or git://
-          @mcp_client.resource_read_request(uri: uri)
+          @coordinator.resource_read(uri: uri)
         end
       end
 

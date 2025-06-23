@@ -13,13 +13,13 @@ module RubyLLM
         end
       end
 
-      attr_reader :name, :description, :arguments, :mcp_client
+      attr_reader :name, :description, :arguments, :coordinator
 
-      def initialize(mcp_client, name:, description:, arguments:)
-        @mcp_client = mcp_client
-        @name = name
-        @description = description
-        @arguments = parse_arguments(arguments)
+      def initialize(coordinator, prompt)
+        @coordinator = coordinator
+        @name = prompt["name"]
+        @description = prompt["description"]
+        @arguments = parse_arguments(prompt["arguments"])
       end
 
       def fetch(arguments = {})
@@ -43,8 +43,8 @@ module RubyLLM
       alias say ask
 
       def complete(argument, value)
-        if @mcp_client.capabilities.completion?
-          response = @mcp_client.completion_prompt(name: @name, argument: argument, value: value)
+        if @coordinator.capabilities.completion?
+          response = @coordinator.completion_prompt(name: @name, argument: argument, value: value)
           response = response.dig("result", "completion")
 
           Completion.new(values: response["values"], total: response["total"], has_more: response["hasMore"])
@@ -56,7 +56,7 @@ module RubyLLM
       private
 
       def fetch_prompt_messages(arguments)
-        response = @mcp_client.execute_prompt(
+        response = @coordinator.execute_prompt(
           name: @name,
           arguments: arguments
         )
@@ -87,7 +87,7 @@ module RubyLLM
           attachment = MCP::Attachment.new(content["content"], content["mime_type"])
           MCP::Content.new(text: nil, attachments: [attachment])
         when "resource"
-          resource = Resource.new(mcp_client, content["resource"])
+          resource = Resource.new(coordinator, content["resource"])
           resource.to_content
         end
       end
