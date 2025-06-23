@@ -3,58 +3,32 @@
 module RubyLLM
   module MCP
     class Client
-      PROTOCOL_VERSION = "2025-03-26"
-      PV_2024_11_05 = "2024-11-05"
+      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version
 
-      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version,
-                  :capabilities
-
-      def initialize(name:, transport_type:, start: true, request_timeout: 8000, reverse_proxy_url: nil, config: {}) # rubocop:disable Metrics/ParameterLists
+      def initialize(name:, transport_type:, start: true, request_timeout: 8000, config: {})
         @name = name
         @config = config
-        @protocol_version = PROTOCOL_VERSION
-        @headers = config[:headers] || {}
-
         @transport_type = transport_type.to_sym
-        @transport = nil
-
-        @capabilities = nil
-
         @request_timeout = request_timeout
-        @reverse_proxy_url = reverse_proxy_url
+        @config[:request_timeout] = request_timeout
+
+        @coordinator = RubyLLM::MCP::Coordinator.new(self, transport_type: @transport_type, config: config)
 
         if start
           self.start
         end
       end
 
-      def request(body, **options)
-        @transport.request(body, **options)
+      def capabilities
+        @coordinator.capabilities
       end
 
       def start
-        case @transport_type
-        when :sse
-          @transport = RubyLLM::MCP::Transport::SSE.new(@config[:url], request_timeout: @request_timeout,
-                                                                       headers: @headers)
-        when :stdio
-          @transport = RubyLLM::MCP::Transport::Stdio.new(@config[:command], request_timeout: @request_timeout,
-                                                                             args: @config[:args], env: @config[:env])
-        when :streamable
-          @transport = RubyLLM::MCP::Transport::Streamable.new(@config[:url], request_timeout: @request_timeout,
-                                                                              headers: @headers)
-        else
-          raise "Invalid transport type: #{transport_type}"
-        end
-
-        @initialize_response = initialize_request
-        @capabilities = RubyLLM::MCP::Capabilities.new(@initialize_response["result"]["capabilities"])
-        notification_request
+        @coordinator.start_transport
       end
 
       def stop
-        @transport&.close
-        @transport = nil
+        @coordinator.stop_transport
       end
 
       def restart!
@@ -63,7 +37,7 @@ module RubyLLM
       end
 
       def alive?
-        !!@transport&.alive?
+        @coordinator.alive?
       end
 
       def tools(refresh: false)
@@ -118,59 +92,15 @@ module RubyLLM
         @prompts[name]
       end
 
-      def execute_tool(**args)
-        RubyLLM::MCP::Requests::ToolCall.new(self, **args).call
-      end
-
-      def resource_read_request(**args)
-        RubyLLM::MCP::Requests::ResourceRead.new(self, **args).call
-      end
-
-      def completion_resource(**args)
-        RubyLLM::MCP::Requests::CompletionResource.new(self, **args).call
-      end
-
-      def completion_prompt(**args)
-        RubyLLM::MCP::Requests::CompletionPrompt.new(self, **args).call
-      end
-
-      def execute_prompt(**args)
-        RubyLLM::MCP::Requests::PromptCall.new(self, **args).call
-      end
-
       private
 
-      def initialize_request
-        RubyLLM::MCP::Requests::Initialization.new(self).call
-      end
-
-      def notification_request
-        RubyLLM::MCP::Requests::Notification.new(self).call
-      end
-
-      def tool_list_request
-        RubyLLM::MCP::Requests::ToolList.new(self).call
-      end
-
-      def resources_list_request
-        RubyLLM::MCP::Requests::ResourceList.new(self).call
-      end
-
-      def resource_template_list_request
-        RubyLLM::MCP::Requests::ResourceTemplateList.new(self).call
-      end
-
-      def prompt_list_request
-        RubyLLM::MCP::Requests::PromptList.new(self).call
-      end
-
       def fetch_and_create_tools
-        tools_response = tool_list_request
+        tools_response = @coordinator.tool_list_request
         tools_response = tools_response["result"]["tools"]
 
         tools = {}
         tools_response.each do |tool|
-          new_tool = RubyLLM::MCP::Tool.new(self, tool)
+          new_tool = RubyLLM::MCP::Tool.new(@coordinator, tool)
           tools[new_tool.name] = new_tool
         end
 
@@ -178,12 +108,12 @@ module RubyLLM
       end
 
       def fetch_and_create_resources
-        resources_response = resources_list_request
+        resources_response = @coordinator.resources_list_request
         resources_response = resources_response["result"]["resources"]
 
         resources = {}
         resources_response.each do |resource|
-          new_resource = RubyLLM::MCP::Resource.new(self, resource)
+          new_resource = RubyLLM::MCP::Resource.new(@coordinator, resource)
           resources[new_resource.name] = new_resource
         end
 
@@ -191,12 +121,12 @@ module RubyLLM
       end
 
       def fetch_and_create_resource_templates
-        resource_templates_response = resource_template_list_request
+        resource_templates_response = @coordinator.resource_template_list_request
         resource_templates_response = resource_templates_response["result"]["resourceTemplates"]
 
         resource_templates = {}
         resource_templates_response.each do |resource_template|
-          new_resource_template = RubyLLM::MCP::ResourceTemplate.new(self, resource_template)
+          new_resource_template = RubyLLM::MCP::ResourceTemplate.new(@coordinator, resource_template)
           resource_templates[new_resource_template.name] = new_resource_template
         end
 
@@ -204,16 +134,12 @@ module RubyLLM
       end
 
       def fetch_and_create_prompts
-        prompts_response = prompt_list_request
+        prompts_response = @coordinator.prompt_list_request
         prompts_response = prompts_response["result"]["prompts"]
 
         prompts = {}
         prompts_response.each do |prompt|
-          new_prompt = RubyLLM::MCP::Prompt.new(self,
-                                                name: prompt["name"],
-                                                description: prompt["description"],
-                                                arguments: prompt["arguments"])
-
+          new_prompt = RubyLLM::MCP::Prompt.new(@coordinator, prompt)
           prompts[new_prompt.name] = new_prompt
         end
 

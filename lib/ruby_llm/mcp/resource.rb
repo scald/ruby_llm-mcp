@@ -3,10 +3,10 @@
 module RubyLLM
   module MCP
     class Resource
-      attr_reader :uri, :name, :description, :mime_type, :mcp_client
+      attr_reader :uri, :name, :description, :mime_type, :coordinator
 
-      def initialize(mcp_client, resource)
-        @mcp_client = mcp_client
+      def initialize(coordinator, resource)
+        @coordinator = coordinator
         @uri = resource["uri"]
         @name = resource["name"]
         @description = resource["description"]
@@ -64,7 +64,7 @@ module RubyLLM
         when "http", "https"
           fetch_uri_content(uri)
         else # file:// or git://
-          @read_response ||= @mcp_client.resource_read_request(uri: uri)
+          @read_response ||= @coordinator.resource_read_request(uri: uri)
         end
       end
 

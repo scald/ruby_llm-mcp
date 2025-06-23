@@ -3,11 +3,11 @@
 module RubyLLM
   module MCP
     class Tool < RubyLLM::Tool
-      attr_reader :name, :description, :parameters, :mcp_client, :tool_response
+      attr_reader :name, :description, :parameters, :coordinator, :tool_response
 
-      def initialize(mcp_client, tool_response)
+      def initialize(coordinator, tool_response)
         super()
-        @mcp_client = mcp_client
+        @coordinator = coordinator
 
         @name = tool_response["name"]
         @description = tool_response["description"].to_s
@@ -15,7 +15,7 @@ module RubyLLM
       end
 
       def execute(**params)
-        response = @mcp_client.execute_tool(
+        response = @coordinator.execute_tool(
           name: @name,
           parameters: params
         )
@@ -106,7 +106,7 @@ module RubyLLM
             "content" => content["resource"]
           }
 
-          resource = Resource.new(mcp_client, resource_data)
+          resource = Resource.new(coordinator, resource_data)
           resource.to_content
         end
       end
