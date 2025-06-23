@@ -58,7 +58,7 @@ module RubyLLM
         when "http", "https"
           fetch_uri_content(uri)
         else # file:// or git://
-          @coordinator.resource_read_request(uri: uri)
+          @coordinator.resource_read(uri: uri)
         end
       end
 

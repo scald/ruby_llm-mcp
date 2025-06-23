@@ -1,149 +1,103 @@
 # frozen_string_literal: true
 
+require "forwardable"
+
 module RubyLLM
   module MCP
     class Client
-      attr_reader :name, :config, :transport_type, :transport, :request_timeout, :reverse_proxy_url, :protocol_version
+      extend Forwardable
+
+      attr_reader :name, :config, :transport_type, :request_timeout
 
       def initialize(name:, transport_type:, start: true, request_timeout: 8000, config: {})
         @name = name
-        @config = config
+        @config = config.merge(request_timeout: request_timeout)
         @transport_type = transport_type.to_sym
         @request_timeout = request_timeout
-        @config[:request_timeout] = request_timeout
 
-        @coordinator = RubyLLM::MCP::Coordinator.new(self, transport_type: @transport_type, config: config)
+        @coordinator = Coordinator.new(self, transport_type: @transport_type, config: @config)
 
-        if start
-          self.start
-        end
+        start_transport if start
       end
 
-      def capabilities
-        @coordinator.capabilities
-      end
+      def_delegators :@coordinator, :start_transport, :stop_transport, :restart_transport, :alive?, :capabilities
 
-      def start
-        @coordinator.start_transport
-      end
-
-      def stop
-        @coordinator.stop_transport
-      end
-
-      def restart!
-        stop
-        start
-      end
-
-      def alive?
-        @coordinator.alive?
-      end
+      alias start start_transport
+      alias stop stop_transport
+      alias restart! restart_transport
 
       def tools(refresh: false)
-        @tools = nil if refresh
-        @tools ||= fetch_and_create_tools
+        fetch(:tools, refresh) do
+          tools_data = @coordinator.tool_list.dig("result", "tools")
+          build_map(tools_data, MCP::Tool)
+        end
+
         @tools.values
       end
 
       def tool(name, refresh: false)
-        @tools = nil if refresh
-        @tools ||= fetch_and_create_tools
+        tools(refresh: refresh)
 
         @tools[name]
       end
 
       def resources(refresh: false)
-        @resources = nil if refresh
-        @resources ||= fetch_and_create_resources
+        fetch(:resources, refresh) do
+          resources_data = @coordinator.resource_list.dig("result", "resources")
+          build_map(resources_data, MCP::Resource)
+        end
+
         @resources.values
       end
 
       def resource(name, refresh: false)
-        @resources = nil if refresh
-        @resources ||= fetch_and_create_resources
+        resources(refresh: refresh)
 
         @resources[name]
       end
 
       def resource_templates(refresh: false)
-        @resource_templates = nil if refresh
-        @resource_templates ||= fetch_and_create_resource_templates
+        fetch(:resource_templates, refresh) do
+          templates_data = @coordinator.resource_template_list.dig("result", "resourceTemplates")
+          build_map(templates_data, MCP::ResourceTemplate)
+        end
+
         @resource_templates.values
       end
 
       def resource_template(name, refresh: false)
-        @resource_templates = nil if refresh
-        @resource_templates ||= fetch_and_create_resource_templates
+        resource_templates(refresh: refresh)
 
         @resource_templates[name]
       end
 
       def prompts(refresh: false)
-        @prompts = nil if refresh
-        @prompts ||= fetch_and_create_prompts
+        fetch(:prompts, refresh) do
+          prompts_data = @coordinator.prompt_list.dig("result", "prompts")
+          build_map(prompts_data, MCP::Prompt)
+        end
+
         @prompts.values
       end
 
       def prompt(name, refresh: false)
-        @prompts = nil if refresh
-        @prompts ||= fetch_and_create_prompts
+        prompts(refresh: refresh)
 
         @prompts[name]
       end
 
       private
 
-      def fetch_and_create_tools
-        tools_response = @coordinator.tool_list_request
-        tools_response = tools_response["result"]["tools"]
-
-        tools = {}
-        tools_response.each do |tool|
-          new_tool = RubyLLM::MCP::Tool.new(@coordinator, tool)
-          tools[new_tool.name] = new_tool
-        end
-
-        tools
+      def fetch(cache_key, refresh)
+        instance_variable_set("@#{cache_key}", nil) if refresh
+        instance_variable_get("@#{cache_key}") || instance_variable_set("@#{cache_key}", yield)
       end
 
-      def fetch_and_create_resources
-        resources_response = @coordinator.resources_list_request
-        resources_response = resources_response["result"]["resources"]
-
-        resources = {}
-        resources_response.each do |resource|
-          new_resource = RubyLLM::MCP::Resource.new(@coordinator, resource)
-          resources[new_resource.name] = new_resource
+      def build_map(raw_data, klass)
+        raw_data.each_with_object({}) do |item, acc|
+          instance = klass.new(@coordinator, item)
+          acc[instance.name] = instance
         end
-
-        resources
-      end
-
-      def fetch_and_create_resource_templates
-        resource_templates_response = @coordinator.resource_template_list_request
-        resource_templates_response = resource_templates_response["result"]["resourceTemplates"]
-
-        resource_templates = {}
-        resource_templates_response.each do |resource_template|
-          new_resource_template = RubyLLM::MCP::ResourceTemplate.new(@coordinator, resource_template)
-          resource_templates[new_resource_template.name] = new_resource_template
-        end
-
-        resource_templates
-      end
-
-      def fetch_and_create_prompts
-        prompts_response = @coordinator.prompt_list_request
-        prompts_response = prompts_response["result"]["prompts"]
-
-        prompts = {}
-        prompts_response.each do |prompt|
-          new_prompt = RubyLLM::MCP::Prompt.new(@coordinator, prompt)
-          prompts[new_prompt.name] = new_prompt
-        end
-
-        prompts
       end
     end
   end

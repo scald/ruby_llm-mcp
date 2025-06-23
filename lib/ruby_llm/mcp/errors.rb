@@ -12,15 +12,17 @@ module RubyLLM
         end
       end
 
+      class CompletionNotAvailable < BaseError; end
+
+      class PromptArgumentError < BaseError; end
+
       class InvalidProtocolVersionError < BaseError; end
 
       class SessionExpiredError < BaseError; end
 
       class TimeoutError < BaseError; end
 
-      class PromptArgumentError < BaseError; end
-
-      class CompletionNotAvailable < BaseError; end
+      class InvalidTransportType < BaseError; end
     end
   end
 end
