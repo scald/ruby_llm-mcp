@@ -28,11 +28,9 @@ module RubyLLM
       def start_transport
         case @transport_type
         when :sse
-          @transport = RubyLLM::MCP::Transport::SSE.new(
-            @config[:url],
-            request_timeout: @config[:request_timeout],
-            headers: @headers
-          )
+          @transport = RubyLLM::MCP::Transport::SSE.new(@config[:url],
+                                                        request_timeout: @config[:request_timeout],
+                                                        headers: @headers)
         when :stdio
           @transport = RubyLLM::MCP::Transport::Stdio.new(@config[:command],
                                                           request_timeout: @config[:request_timeout],
