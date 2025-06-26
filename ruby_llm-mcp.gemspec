@@ -4,10 +4,10 @@ require_relative "lib/ruby_llm/mcp/version"
 
 # rubocop:disable Metrics/BlockLength
 Gem::Specification.new do |spec|
-  spec.name = "ruby_llm-mcp"
+  spec.name = "sc-ruby_llm-mcp"
   spec.version = RubyLLM::MCP::VERSION
-  spec.authors = ["Patrick Vice"]
-  spec.email = ["patrickgvice@gmail.com"]
+  spec.authors = ["Patrick Vice", "Steve Caldwell"]
+  spec.email = ["patrickgvice@gmail.com", "sc@scald.io"]
 
   spec.summary = "A RubyLLM MCP Client"
   spec.description = <<~DESC
@@ -17,12 +17,12 @@ Gem::Specification.new do |spec|
     services. Makes using MCP with RubyLLM as easy as possible.
   DESC
 
-  spec.homepage = "https://github.com/patvice/ruby_llm-mcp"
+  spec.homepage = "https://github.com/scald/ruby_llm-mcp"
   spec.license = "MIT"
   spec.required_ruby_version = Gem::Requirement.new(">= 3.1.3")
 
   spec.metadata["homepage_uri"] = spec.homepage
-  spec.metadata["source_code_uri"] = "https://github.com/patvice/ruby_llm-mcp"
+  spec.metadata["source_code_uri"] = "https://github.com/scald/ruby_llm-mcp"
   spec.metadata["changelog_uri"] = "#{spec.metadata['source_code_uri']}/commits/main"
   spec.metadata["documentation_uri"] = spec.homepage
   spec.metadata["bug_tracker_uri"] = "#{spec.metadata['source_code_uri']}/issues"
